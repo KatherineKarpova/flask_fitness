@@ -1,0 +1,153 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%; /* Ensure the full height is used for the page */
+    margin: 0; /* Remove default margin */
+}
+
+/* Body */
+body {
+    font-family: 'Helvetica', sans-serif;
+    background: linear-gradient(to right, #ff6cc8, #c97cff); /* Bright pink to vivid purple gradient */
+    color: #4a0031; /* Deep purple text */
+    line-height: 1.6;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start; /* Align items to the top */
+    height: 100%; /* Take full height */
+    text-align: center;
+    flex-direction: column; /* Center content vertically */
+    padding-top: 0; /* No padding on top since the navbar is fixed */
+}
+
+/* Navbar - Fixed at the top */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #f8f9fa; /* Light background for navbar */
+    z-index: 1000; /* Ensure navbar stays on top of other elements */
+    border-bottom: 2px solid #ff6cc8; /* Border for separation */
+    padding: 0; /* Remove padding */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a small shadow under navbar */
+}
+
+.navbar-nav {
+    padding: 0;
+}
+
+.navbar-nav .nav-item .nav-link {
+    font-size: 1.2em;
+    color: #4a0031; /* Dark purple text for navbar links */
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-item .nav-link:hover {
+    color: #ff1c8e; /* Neon pink on hover */
+}
+
+/* Main content container */
+.container {
+    background-color: rgba(255, 255, 255, 0.9); /* Light white background */
+    border-radius: 15px;
+    padding: 30px;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 80px; /* Make space for the fixed navbar */
+}
+
+/* Header */
+h1, h2, h3 {
+    font-family: 'Arial', sans-serif;
+    color: #ff1c8e; /* Bright neon pink */
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Buttons */
+button, .btn {
+    background-color: #ff1c8e; /* Neon pink */
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+}
+
+button:hover, .btn:hover {
+    background-color: #c70075; /* Darker pink on hover */
+    transform: translateY(-5px); /* Slight lift effect */
+}
+
+button:focus, .btn:focus {
+    outline: none;
+}
+
+/* Input Fields */
+input, select, textarea {
+    border: 2px solid #ff6cc8; /* Bright pink border */
+    border-radius: 15px;
+    padding: 12px;
+    width: 100%;
+    font-size: 1.3em;
+    margin: 10px 0;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #c97cff; /* Vivid purple focus border */
+    box-shadow: 0 0 10px rgba(201, 124, 255, 0.5); /* Purple glowing effect */
+}
+
+/* Links */
+a {
+    color: #ff1c8e; /* Bright pink links */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #c70075; /* Darker pink on hover */
+}
+
+/* Form labels */
+label {
+    font-size: 1.3em;
+    color: #4a0031; /* Dark purple */
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Footer */
+footer {
+    background-color: #ff6cc8; /* Bright pink background */
+    color: #4a0031; /* Dark purple text */
+    text-align: center;
+    padding: 15px 0;
+    border-radius: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.2em;
+}
+
+/* Image styles */
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
