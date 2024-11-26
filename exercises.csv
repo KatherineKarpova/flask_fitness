@@ -1,0 +1,30 @@
+exercise,type,prime movers,synergists,movement pattern
+conventional deadlift,dynamic compound,"gluteus maximus,quads,traps","hamstrings,adductor magnus,soleus,lats,lower back",hinge
+sumo deadlift,dynamic compound,"gluteus maximus,traps","quads,adductor magnus,soleus,lower back",hinge
+single leg stiff leg deadlift,dynamic compound,"gluteus maximus,hamstrings","adductor magnus,quadriceps,soleus,lower back",hinge
+bulgarian split squat,dynamic compound,"quads,gluteus maximus","hamstrings,gluteus medius,gluteus minimus",squat
+split squat,dynamic compound,"quads,gluteus maximus","hamstrings,gluteus medius,gluteus minimus",squat
+sumo squat,dynamic compound,"quads,glutes","adductors,hamstrings,calves",squat
+goblet squat,dynamic compound,"quads,gluteus maximus","hamstrings,transverse abdominis,calves",squat
+glute medius hip thrust,dynamic isolation,"gluteus medius,gluteus minimus",abduction
+barbell hip thrust,dynamic isolation,gluteus maximus,"hamstrings,adductor magnus",hinge
+overhead shoulder press,dynamic compound,anterior deltoid,"lateral deltoid,triceps,pectoralis minor",push
+front raises,dynamic isolation,anterior deltoid,pectoralis minor,push
+lateral raises,dynamic isolation,lateral deltoid,pectoralis minor,push
+reverse fly,dynamic isolation,posterior deltoids,"rhomboids,traps,rotator cuff",pull
+single arm bent over back row,dynamic compound,"lats,traps,rhomboids,posterior deltoids",erector spinae,pull
+barbell back row,dynamic compound,lats,"rhomboids,traps,biceps,teres major",pull
+calf raises,dynamic isolation,soleus,gastrocnemius,ankle extension
+straight leg raises,dynamic isolation,"hip flexors,transverse abdominis,rectus abdominis","quads,rectus abdominis,obliques",abduction
+side-lying leg raises,dynamic isolation,"iliopsoas,gluteus medius,gluteus minimus","core,hamstrings,lower back",abduction
+deadbug,dynamic isolation,"transverse abdominis,rectus abdominis,obliques,erector spinae","hip flexors,shoulders,back,pelvic floor",anti-rotation
+reverse crunch,dynamic isolation,rectus abdominis,"obliques,transverse abdominis",trunk flexion
+butterfly crunch,dynamic isolation,"rectus abdominis,transverse abdominis","lower back,obliques", trunk flexion
+pull-up,dynamic compound,"lats,biceps","trapezius,rhomboids,posterior deltoids",pull
+plank,static compound,"erector spinae,rectus abdominis,transverse abdominis","trapezius,rhomboids,rotator cuff,deltoids,pectorals,serratus anterior,glutes,quads,gastrocnemius",anti-rotation
+reverse plank,static compound,"gluteus maximus,gluteus medius,gluteus minimus,hamstrings,erector spinae,triceps","transversus abdominis,obliques,posterior deltoids",anti-rotation
+single arm plank,static compound,"erector spinae,rectus abdominis,transverse abdominis","trapezius,rhomboids,rotator cuff,deltoids,pectorals,serratus anterior,glutes,quads,gastrocnemius",anti-rotation
+boat,static isolation,"rectus abdominis,transversus abdominis","obliques,lower back,hip flexors",anti-rotation
+stomach vacuum,static isolation,transversus abdominis,"obliques,pelvic floor",anti-rotation
+locust pose,static compound,"erector spinae,lats,rhomboids,trapezius muscles,gluteus maximus","core,triceps,hamstrings",back extension
+deadhang,static compound,"forearms,lats,traps,posterior deltoids,anterior deltoids",pull

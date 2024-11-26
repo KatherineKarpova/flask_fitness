@@ -1,48 +1,64 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block title %}
     Record
 {% endblock %}
 
 {% block main %}
-    <form action="/record" method="post">
-        <div id="record-date"></div>
+    <form action='/' method='post'>
+        <label for='entry-date'>Date</label>
+        <div id='entry-date'></div>
 
-        <label for="exercise-input">Select an Exercise:</label>
-        <input list="exercise-list" id="exercise-input" name="exercise" placeholder="Exercise">
+        <label for='exercise-input'>Select an Exercise:</label>
+        <input list='exercise-list' id='exercise-input' name='exercise' placeholder='Exercise'>
 
         <!-- Datalist that will be populated with exercise names -->
-        <datalist id="exercise-list">
+        <datalist id='exercise-list'>
             {% for exercise in exercises %}
-                <option value="{{ exercise[0] }} lbs"></option> <!-- Ensure options are self-closed -->
+                <option value='{{ exercise[0] }}'></option> <!-- Ensure options are self-closed -->
             {% endfor %}
         </datalist>
 
-        <label for="weight">Weight:</label>
+        <label for='weight'>Weight:</label>
         <!-- Input with placeholder text -->
-        <input name="weight" type="text" id="weight" placeholder="bodyweight" value="bodyweight">
+        <input name='weight' type='text' id='weight' placeholder='Bodyweight' value='bodyweight'>
 
-        <label for="reps">Reps:</label>
-        <input name="reps" type="text" id="reps" placeholder="">
+        <label for='reps'>Reps:</label>
+        <input name='reps' type='text' id='reps' placeholder='Reps'>
 
-        <label for="time">Time:</label>
-        <input name="hours" type="number" id="hours" placeholder="Hour(s)">
-        <span class="colon">:</span>
-        <input name="minutes" type="number" id="minutes" placeholder="Minute(s)">
-        <span class="colon">:</span>
-        <input name="seconds" type="number" id="seconds" placeholder="Seconds">
+        <label for='time'>Time:</label>
+        <input name='hours' type='number' id='hours' placeholder='Hour(s)'>
+        <span class='colon'>:</span>
+        <input name='minutes' type='number' id='minutes' placeholder='Minute(s)'>
+        <span class='colon'>:</span>
+        <input name='seconds' type='number' id='seconds' placeholder='Seconds'>
 
-        <input type="submit" id="submit" value="Submit">
+        <input type='submit' id='submit' value='Submit'>
     </form>
 
     <script>
         // html code for the date form
         // have default date on form be today's date
         // allow date to be changed dynamically
-        window.onload = function() {
-            dateForm('record-date');
-            updateTodayDate('record-date');
-        };
+// Function to be called after the page loads
+window.onload = function() {
+    const formId = 'entry-date';  // The ID of the container for the date form
+    dateForm(formId);  // Create the date form
+
+    const elements = defineDateElements(formId);  // Get the form elements
+
+    // Populate the year dropdown
+    populateYearDropdown(elements.yearElement);
+
+    // Set today's date as the default value
+    setToday(formId);
+
+    updateDays(formId);
+
+    // Add event listeners to update days when month or year is changed
+    elements.monthElement.addEventListener('change', () => updateDays(elements));
+    elements.yearElement.addEventListener('change', () => updateDays(elements));
+};
 
         // Weight input logic: placeholder disappears on focus and reverts to 'bodyweight' if left empty
         const weightInput = document.getElementById('weight');

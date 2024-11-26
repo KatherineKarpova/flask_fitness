@@ -1,15 +1,15 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 
 {% block title %}
     Register
 {% endblock %}
 
 {% block main %}
-    <form action="/register", method="post">
-        <input name="email" placeholder="Email" type="text">
-        <input name="email-confirmation" placeholder="Confirm Email" type="text">
-        <input name="password" placeholder="Password" type="text">
-        <input name="password-confirmation" placeholder="Confirm Password" type="text">
-        <button type="submit">Register</button>
+    <form action='/register' method='post'>
+        <input name='email' placeholder='Email' type='text'>
+        <input name='email-confirmation' placeholder='Confirm Email' type='text'>
+        <input name='password' placeholder='Password' type='text'>
+        <input name='password-confirmation' placeholder='Confirm Password' type='text'>
+        <button type='submit'>Register</button>
     </form>
 {% endblock %}

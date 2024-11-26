@@ -1,4 +1,4 @@
 Flask==2.2.2
 werkzeug==2.2.2
 email-validator==1.2.1
-flask_session==2.2.2
+Flask-Session==0.8.0

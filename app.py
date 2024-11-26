@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import hashlib
 from email_validator import validate_email, EmailNotValidError
-from calendar import month_name
+import calendar
 import datetime
 
 # initialize flask app
@@ -30,48 +30,48 @@ def login_required(f):
     return decorated_function
 
 # function to make list of exercise names
-def exercise_names():
+def exercise_names(c):
     return c.execute("SELECT name FROM exercises").fetchall()
 
 # get dates from a date form
-def get_date(form_id):
-    # List of months (1-based index), skipping the empty string at index 0
-    months = list(calendar.month_name[1:])
+def get_date_input(form_id):
+    month = request.form.get(f'month-{form_id}').strip()
+    day = request.form.get(f'day-{form_id}').strip()
+    year = request.form.get(f'year-{form_id}').strip()
     
-    # Retrieve values from form
-    month = request.form.get('month')
-    year = request.form.get('year')
-    day = request.form.get('day')
-    
-    # Ensure all fields are provided
+    # check for empty fields
     if not month or not year or not day:
-        raise ValueError("Missing data: month, day, and year are required")
-
+        raise ValueError('Missing data: month, day, and year are required')
     try:
-        # Convert to proper date format
-        month_num = months.index(month) + 1  # months are 1-indexed, so +1
-        return datetime.date(int(year), month_num, int(day)).isoformat()
+        month, year, day = map(int, [month, year, day])
     except ValueError as e:
         # In case of invalid month or other issues
-        raise ValueError(f"Invalid data provided: {str(e)}")
+        raise ValueError(f'Invalid data provided: {str(e)}')
+    return month, day, year
     
+def format_date(month, day, year):
+    # format date as YYYY-MM-DD
+    return datetime.date(year, month, day).isoformat()
+
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
     conn = sqlite3.connect('fitness.db')
     c = conn.cursor()
-    import calendar
-    exercises = c.execute("SELECT name FROM exercises").fetchall()
-    # Create list to loop through in dropdown menu
-    # I used a line of code from geeksforgeeks.com
-    date = get_date('record-date')
+    # get exercises from db for dropdown menu
+    exercises = exercise_names(c)
+
     if request.method == 'POST':
-
+        month, day, year = get_date_input('entry-date')
+        date = format_date(month, day, year)
         exercise = request.form.get('exercise')
-        exercise_id = c.execute('''SELECT id FROM exercises WHERE name = ?''', (exercise,))
-
+        exercise_query = c.execute('''SELECT id FROM exercises WHERE name = ?''', (exercise,)).fetchone()
+        if exercise_query is None:
+            flash('Exercise not found.')
+            return redirect('/index.html')
+        exercise_id = exercise_query[0]
+        # convert weight, reps, and time to ints unless empty
         weight = request.form.get('weight')
-        # convert weight, reps, and time to ints unless it is bodyweight
         if weight != 'bodyweight':
             try:
                 weight = int(weight)
@@ -83,28 +83,24 @@ def index():
         try:
             reps = int(request.form.get('reps'))
         except ValueError:
-            #try:
-                #reps = w2n.word_to_num(request.form.get('reps'))
-            #except Exception:
-                reps = None
+            reps = None
         try:
-            hours = int(request.form.get('hours'))
-            minutes = int(request.form.get('minutes'))
-            seconds = int(request.form.get('seconds'))
+            hours, minutes, seconds = map(int,[request.form.get('hours')], request.form.get('minutes'), request.form.get('seconds'))
+            time = (f"{hours:02}:{minutes:02}:{seconds:02}")
 
         except ValueError:
             time = None
-        time = (f"{hours:02}:{minutes:02}:{seconds:02}")
+        print(session['user_id'], date, exercise_id, weight, reps, time)
         # Save data to database
-        c.execute('INSERT INTO logs (user_id, date, exercise_id, weight_lbs, reps, time) VALUES (?, ?, ?, ?, ?, ?)',
+        c.execute('INSERT INTO logs (user_id, date, exercise_id, weight, reps, time) VALUES (?, ?, ?, ?, ?, ?)',
                   (session['user_id'], date, exercise_id, weight, reps, time))
         conn.commit()
         conn.close()
 
         # Re-render the form with the previous values filled in
-        return render_template('index.html', exercises=exercises,
+        return render_template('index.html', month=month, day=day, year=year, exercises=exercises,
                                exercise=exercise, weight=weight, reps=reps, time=time)
-    return render_template('index.html')
+    return render_template('index.html', exercises=exercises)
 
 # link to login page
 def login_link():
