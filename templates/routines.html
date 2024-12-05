@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+<form action='/' method='post'>
+    <label for="routine-name">Routine Name</label>
+    <input type='text' id='routine-name' name='routine-name' placeholder='routine name' class="exercise-input" required>
+    <div id="exercise-container">
+        <div class="exercise-entry">
+            <label for="exercise">Exercise</label>
+            <input list="exercise-list" name="exercise" id="exercise-input" class="exercise-input" placeholder="exercise">
+            <datalist id="exercise-list">
+                {% for exercise in exercises_list %}
+                    <option value="{{ exercise }}"></option>                
+                {% endfor %}
+            </datalist>
+            <label for="sets">Sets</label>
+            <input name="sets" type="text" id="sets" placeholder="sets" class="short-input">
+        </div>
+    </div>
+    <!-- Dynamic fields for exercises and sets -->
+    <div id="add-exercise-container">
+        <!-- Initial exercise and set fields will be displayed here -->
+    </div>
+    <!-- Button to add more exercises if superset is selected -->
+    <button type="button" id="add-exercise">Add Exercise</button>
+
+    <!-- Submit button -->
+    <button type="submit">Submit Routine</button>
+</form>
+
+<script>
+    document.getElementById("add-exercise").addEventListener("click", function() {
+    const exerciseContainer = document.getElementById("add-exercise-container");
+    if (exerciseContainer) {
+        // Create a new div for the exercise entry
+        const newExerciseDiv = document.createElement("div");
+        newExerciseDiv.classList.add("exercise-entry");
+
+        // Call addExercise to populate the datalist and input
+        addExercise(newExerciseDiv).then(() => {
+            // After the datalist is populated, add weight and reps input fields
+            addInputField("sets", "sets", newExerciseDiv, "short-input");
+
+            // Append the new exercise div to the container
+            exerciseContainer.appendChild(newExerciseDiv);
+        }).catch(error => {
+            console.error('Error fetching exercise data:', error);
+        });
+    }
+});
+</script>
+
+{% endblock %}

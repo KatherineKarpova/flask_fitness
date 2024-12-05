@@ -1,85 +1,79 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
 {% block title %}
     Record
 {% endblock %}
 
 {% block main %}
-    <form action='/' method='post'>
-        <label for='entry-date'>Date</label>
-        <div id='entry-date'></div>
+<form action="/" method="post">
+    <label for="entry-date">Date</label>
+    <div id="entry-date"></div>
+    <select id="routine-select" name="routine" placeholder="follow a routine"></select>
+    <option></option>
+    <div id="exercise-container">
+        <div class="exercise-entry">
+            <label for="exercise">Exercise</label>
+            <input list="exercise-list" name="exercise" id="exercise-input" class="exercise-input" placeholder="exercise">
+            <datalist id="exercise-list">
+                {% for exercise in exercises %}
+                    <option value="{{ exercise }}"></option>                
+                {% endfor %}
+            </datalist>
+            <label for="weight">Weight</label>
+            <input name="weight" type="text" id="weight" placeholder="lbs" value="{{ weight }}" class="short-input">
 
-        <label for='exercise-input'>Select an Exercise:</label>
-        <input list='exercise-list' id='exercise-input' name='exercise' placeholder='Exercise'>
+            <label for="reps">Reps</label>
+            <input name="reps" type="text" id="reps" placeholder="reps" value="{{ reps }}" class="short-input">
+        </div>
+    </div>
+    <!-- Container for dynamically added exercise fields -->
+    <div id="add-exercise-container"></div>
 
-        <!-- Datalist that will be populated with exercise names -->
-        <datalist id='exercise-list'>
-            {% for exercise in exercises %}
-                <option value='{{ exercise[0] }}'></option> <!-- Ensure options are self-closed -->
-            {% endfor %}
-        </datalist>
+    <button type="button" id="add-exercise">Add Exercise</button>
+    <button type="submit">Record your workout!</button>
+</form>
 
-        <label for='weight'>Weight:</label>
-        <!-- Input with placeholder text -->
-        <input name='weight' type='text' id='weight' placeholder='Bodyweight' value='bodyweight'>
+<script>
+    window.onload = function() {
+        const formId = "entry-date";
+        dateForm(formId);
+        const elements = defineDateElements(formId);
+        populateYearDropdown(elements);
+        updateDays(elements);
+        setToday(elements);
 
-        <label for='reps'>Reps:</label>
-        <input name='reps' type='text' id='reps' placeholder='Reps'>
-
-        <label for='time'>Time:</label>
-        <input name='hours' type='number' id='hours' placeholder='Hour(s)'>
-        <span class='colon'>:</span>
-        <input name='minutes' type='number' id='minutes' placeholder='Minute(s)'>
-        <span class='colon'>:</span>
-        <input name='seconds' type='number' id='seconds' placeholder='Seconds'>
-
-        <input type='submit' id='submit' value='Submit'>
-    </form>
-
-    <script>
-        // html code for the date form
-        // have default date on form be today's date
-        // allow date to be changed dynamically
-// Function to be called after the page loads
-window.onload = function() {
-    const formId = 'entry-date';  // The ID of the container for the date form
-    dateForm(formId);  // Create the date form
-
-    const elements = defineDateElements(formId);  // Get the form elements
-
-    // Populate the year dropdown
-    populateYearDropdown(elements.yearElement);
-
-    // Set today's date as the default value
-    setToday(formId);
-
-    updateDays(formId);
-
-    // Add event listeners to update days when month or year is changed
-    elements.monthElement.addEventListener('change', () => updateDays(elements));
-    elements.yearElement.addEventListener('change', () => updateDays(elements));
-};
-
-        // Weight input logic: placeholder disappears on focus and reverts to 'bodyweight' if left empty
-        const weightInput = document.getElementById('weight');
-
-        weightInput.addEventListener('focus', function() {
-            if (weightInput.value === 'bodyweight') {
-                weightInput.value = '';
-            }
+        // Add event listeners to trigger the updateDays function when month or year changes
+        elements.monthElement.addEventListener("change", function() {
+            updateDays(elements);
         });
 
-        weightInput.addEventListener('blur', function() {
-            if (weightInput.value === '') {
-                weightInput.value = 'bodyweight';
-            }
+        // Update the days when the month changes
+        elements.yearElement.addEventListener("change", function() {
+            updateDays(elements);  // Update the days when the year changes
         });
+    };
+    document.addEventListener("DOMContentLoaded", get_routines);
 
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(event) {
-            if (weightInput.value === '') {
-                weightInput.value = 'bodyweight';
-            }
+    document.getElementById("add-exercise").addEventListener("click", function() {
+    const exerciseContainer = document.getElementById("add-exercise-container");
+        // Create a new div for the exercise entry
+        const newExerciseDiv = document.createElement("div");
+        newExerciseDiv.classList.add("exercise-entry");
+
+        // Call addExercise to populate the datalist and input
+        addExercise(newExerciseDiv).then(() => {
+            // After the datalist is populated, add weight and reps input fields
+            addInputField("weight", "lbs", newExerciseDiv, "short-input");
+            addInputField("reps", "reps", newExerciseDiv, "short-input");
+
+            // Append the new exercise div to the container
+            exerciseContainer.appendChild(newExerciseDiv);
+        }).catch(error => {
+            console.error('Error fetching exercise data:', error);
         });
-    </script>
+    });
+</script>
 {% endblock %}
+
+
+

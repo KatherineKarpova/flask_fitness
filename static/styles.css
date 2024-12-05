@@ -5,149 +5,201 @@
     box-sizing: border-box;
 }
 
-html, body {
-    height: 100%; /* Ensure the full height is used for the page */
-    margin: 0; /* Remove default margin */
-}
-
 /* Body */
 body {
-    font-family: 'Helvetica', sans-serif;
-    background: linear-gradient(to right, #ff6cc8, #c97cff); /* Bright pink to vivid purple gradient */
-    color: #4a0031; /* Deep purple text */
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #ff7b9f, #f3a6d6); /* Light pink to pastel purple gradient */
+    color: #6d0041; /* Deep berry purple text */
     line-height: 1.6;
     display: flex;
     justify-content: flex-start;
     align-items: flex-start; /* Align items to the top */
-    height: 100%; /* Take full height */
+    height: 100%;
     text-align: center;
-    flex-direction: column; /* Center content vertically */
-    padding-top: 0; /* No padding on top since the navbar is fixed */
+    flex-direction: column;
+    padding-top: 0;
+    padding-bottom: 30px;
 }
 
-/* Navbar - Fixed at the top */
+/* Navbar Styles */
 nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #f8f9fa; /* Light background for navbar */
-    z-index: 1000; /* Ensure navbar stays on top of other elements */
-    border-bottom: 2px solid #ff6cc8; /* Border for separation */
-    padding: 0; /* Remove padding */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a small shadow under navbar */
+    background-color: #ff4c8b; /* Girly, bold pink */
+    border-radius: 25px; /* Rounded corners for a softer look */
+    padding: 10px 20px; /* Increase padding for a larger navbar */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
 }
 
-.navbar-nav {
-    padding: 0;
-}
-
-.navbar-nav .nav-item .nav-link {
-    font-size: 1.2em;
-    color: #4a0031; /* Dark purple text for navbar links */
+.navbar-brand {
+    font-size: 2em; /* Bigger brand font */
     font-weight: bold;
-    transition: color 0.3s ease;
-}
-
-.navbar-nav .nav-item .nav-link:hover {
-    color: #ff1c8e; /* Neon pink on hover */
-}
-
-/* Main content container */
-.container {
-    background-color: rgba(255, 255, 255, 0.9); /* Light white background */
-    border-radius: 15px;
-    padding: 30px;
-    width: 80%;
-    max-width: 600px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    margin-top: 80px; /* Make space for the fixed navbar */
-}
-
-/* Header */
-h1, h2, h3 {
-    font-family: 'Arial', sans-serif;
-    color: #ff1c8e; /* Bright neon pink */
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 2.5em;
+    color: #4f009a;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    font-family: 'Arial', sans-serif;
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.3em;  /* Increase font size */
+    color: #fca4f1; /* White text for links */
+    font-weight: bold;
+    margin-right: 20px;
+    padding: 8px 15px;
+    border-radius: 25px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #f91c75; /* Light pink on hover */
+    color: #fff;
+    transform: translateY(-2px); /* Hover animation */
+}
+
+.navbar-toggler {
+    border: none;
+    background-color: #fff; /* White background for the toggler */
+    border-radius: 50%; /* Round toggle button */
+}
+
+.navbar-toggler-icon {
+    background-color: #ff4c8b; /* Pink icon for the toggler */
+}
+
+/* Flash Messages */
+.alert {
+    border-radius: 25px;
+    background-color: #ff7b9f; /* Soft pink for alert messages */
+    color: #6d0041; /* Deep berry purple text */
+    font-weight: bold;
+    padding: 15px;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background-color: #4CAF50; /* Success green */
+}
+
+.alert-danger {
+    background-color: #920a00; /* Error red */
+}
+
+.alert-info {
+    background-color: #17c2f6; /* Info blue */
+}
+
+
+/* Exercise Entry Container */
+/* Exercise Entry Container */
+#exercise-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between each exercise entry */
+}
+
+/* Adjustments to Exercise Entry */
+.exercise-entry {
+    display: flex;
+    gap: 10px;  /* Space between exercise, weight, and reps inputs */
+    margin: 0;  /* Remove margin to avoid unnecessary space between inputs */
+    padding: 5px 0; /* Optional: Add slight padding between rows */
+}
+/* Style for the exercise input (wider and taller) */
+.exercise-input {
+    width: 300px;   /* Wider */
+    height: 40px;   /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 10px;   /* Padding for a comfortable space inside */
+    font-size: 1.3em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
+    transition: border-color 0.3s ease;
+}
+
+/* Style for the weight and reps inputs (shorter and equal size) */
+.short-input {
+    width: 80px;   /* Shorter */
+    height: 40px;  /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 10px;   /* Padding for a comfortable space inside */
+    font-size: 1.3em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
+    transition: border-color 0.3s ease;
 }
 
 /* Buttons */
 button, .btn {
-    background-color: #ff1c8e; /* Neon pink */
-    color: #fff;
-    border: none;
+    background-color: #ff4c8b;
+    color: white;
     padding: 15px 30px;
     font-size: 1.5em;
-    border-radius: 30px;
+    border-radius: 25px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 button:hover, .btn:hover {
-    background-color: #c70075; /* Darker pink on hover */
-    transform: translateY(-5px); /* Slight lift effect */
+    background-color: #f91c75;
+    transform: translateY(-5px);
 }
 
-button:focus, .btn:focus {
+button:focus {
     outline: none;
 }
 
-/* Input Fields */
-input, select, textarea {
-    border: 2px solid #ff6cc8; /* Bright pink border */
-    border-radius: 15px;
-    padding: 12px;
-    width: 100%;
-    font-size: 1.3em;
-    margin: 10px 0;
+/* Style for select menus (month, day, year) */
+select {
+    width: 150px;   /* Same width as short-input fields */
+    height: 40px;   /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 10px;   /* Padding for a comfortable space inside */
+    font-size: 1.2em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
     transition: border-color 0.3s ease;
 }
 
-input:focus, select:focus, textarea:focus {
-    border-color: #c97cff; /* Vivid purple focus border */
-    box-shadow: 0 0 10px rgba(201, 124, 255, 0.5); /* Purple glowing effect */
+select:focus {
+    border-color: #f91c75; /* Border color when focused */
+    box-shadow: 0 0 10px rgba(249, 28, 117, 0.3); /* Light pink glow when focused */
 }
 
-/* Links */
-a {
-    color: #ff1c8e; /* Bright pink links */
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s ease;
+/* Align the month, day, and year fields horizontally */
+#entry-date {
+    display: flex;
+    gap: 10px; /* Space between month, day, and year fields */
+    justify-content: center; /* Center the fields horizontally */
 }
 
-a:hover {
-    color: #c70075; /* Darker pink on hover */
+/* If you want to make sure the select boxes align with the text inputs */
+#entry-date select {
+    height: 50px;  /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 5px;
+    margin-bottom: 20px;   /* Padding for a comfortable space inside */
+    font-size: 1 em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
+    transition: border-color 0.3s ease;
+}
+/* Specific widths for each select element */
+#entry-date .month {
+    width: 130px; /* Width for the month select */
 }
 
-/* Form labels */
-label {
-    font-size: 1.3em;
-    color: #4a0031; /* Dark purple */
-    margin-bottom: 5px;
-    display: block;
+#entry-date .day {
+    width: 60px; /* Width for the day select */
 }
 
-/* Footer */
-footer {
-    background-color: #ff6cc8; /* Bright pink background */
-    color: #4a0031; /* Dark purple text */
-    text-align: center;
-    padding: 15px 0;
-    border-radius: 10px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    font-size: 1.2em;
-}
-
-/* Image styles */
-img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
+#entry-date .year {
+    width: 80px; /* Width for the year select */
 }

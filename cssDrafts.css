@@ -1,0 +1,208 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(to right, #ff7b9f, #f3a6d6); /* Light pink to pastel purple gradient */
+    color: #6d0041; /* Deep berry purple text */
+    line-height: 1.6;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start; /* Align items to the top */
+    height: 100%;
+    text-align: center;
+    flex-direction: column;
+    padding-top: 0;
+    padding-bottom: 30px;
+}
+
+/* Navbar Styles */
+nav {
+    background-color: #ff4c8b; /* Girly, bold pink */
+    border-radius: 25px; /* Rounded corners for a softer look */
+    padding: 10px 20px; /* Increase padding for a larger navbar */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.navbar-brand {
+    font-size: 2em; /* Bigger brand font */
+    font-weight: bold;
+    color: #4f009a;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Arial', sans-serif;
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.3em;  /* Increase font size */
+    color: #fca4f1; /* White text for links */
+    font-weight: bold;
+    margin-right: 20px;
+    padding: 8px 15px;
+    border-radius: 25px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #f91c75; /* Light pink on hover */
+    color: #fff;
+    transform: translateY(-2px); /* Hover animation */
+}
+
+.navbar-toggler {
+    border: none;
+    background-color: #fff; /* White background for the toggler */
+    border-radius: 50%; /* Round toggle button */
+}
+
+.navbar-toggler-icon {
+    background-color: #ff4c8b; /* Pink icon for the toggler */
+}
+
+/* Flash Messages */
+.alert {
+    border-radius: 25px;
+    background-color: #ff7b9f; /* Soft pink for alert messages */
+    color: #6d0041; /* Deep berry purple text */
+    font-weight: bold;
+    padding: 15px;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background-color: #4CAF50; /* Success green */
+}
+
+.alert-danger {
+    background-color: #920a00; /* Error red */
+}
+
+.alert-info {
+    background-color: #17c2f6; /* Info blue */
+}
+
+
+/* Exercise Entry Container */
+#exercise-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Space between each exercise entry */
+}
+/* Style for the label */
+.exercise-entry label {
+    font-size: 1.2em;
+    color: #6d0041; /* Deep berry purple for the label */
+    font-weight: bold;
+    text-transform: uppercase; /* Capitalize the label text */
+}
+/* Style for each exercise entry, laying out inputs horizontally */
+.exercise-entry {
+    display: flex;
+    gap: 10px;  /* Space between exercise, weight, and reps inputs */
+    flex-direction: column; /* Stack label and input vertically */
+    align-items: center; /* Center the label and input */
+    gap: 5px; /* Space between label and input */
+    margin-bottom: 20px;
+}
+
+/* Style for the exercise input (wider and taller) */
+.exercise-input {
+    width: 300px;   /* Wider */
+    height: 40px;   /* Taller */
+    width: 150px;   /* Same width as short-input fields */
+    height: 40px;   /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 10px;   /* Padding for a comfortable space inside */
+    font-size: 1.3em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
+    transition: border-color 0.3s ease;
+}
+
+/* Style for the weight and reps inputs (shorter and equal size) */
+.short-input {
+    width: 150px;   /* Shorter */
+    height: 40px;   /* Taller */
+    width: 150px;   /* Same width as short-input fields */
+    height: 40px;   /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 10px;   /* Padding for a comfortable space inside */
+    font-size: 1.3em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
+    transition: border-color 0.3s ease;
+}
+
+/* Buttons */
+button, .btn {
+    background-color: #ff4c8b;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    border-radius: 25px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+button:hover, .btn:hover {
+    background-color: #f91c75;
+    transform: translateY(-5px);
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Style for select menus (month, day, year) */
+select {
+    width: 150px;   /* Same width as short-input fields */
+    height: 40px;   /* Same height */
+    border: 2px solid #ff4c8b; /* Same border style */
+    border-radius: 25px; /* Rounded corners like the other inputs */
+    padding: 10px;   /* Padding for a comfortable space inside */
+    font-size: 1.2em; /* Same font size */
+    background-color: #fff; /* White background for select */
+    color: #6d0041; /* Deep berry purple text */
+    transition: border-color 0.3s ease;
+}
+
+select:focus {
+    border-color: #f91c75; /* Border color when focused */
+    box-shadow: 0 0 10px rgba(249, 28, 117, 0.3); /* Light pink glow when focused */
+}
+
+/* Align the month, day, and year fields horizontally */
+#entry-date {
+    display: flex;
+    gap: 10px; /* Space between month, day, and year fields */
+    justify-content: center; /* Center the fields horizontally */
+}
+
+/* If you want to make sure the select boxes align with the text inputs */
+#entry-date select {
+    width: 150px;  /* Same width as the input fields for uniformity */
+    height: 40px;  /* Same height */
+    font-size: 1.2em; /* Ensure same font size */
+    padding: 10px;   /* Same padding for consistency */
+}
+/* Style for the label */
+label {
+    font-size: 1.2em;
+    color: #6d0041; /* Deep berry purple for the label */
+    font-weight: bold;
+    text-transform: uppercase; /* Capitalize the label text */
+}
