@@ -43,7 +43,7 @@ class Exercise(db.Model):
 
 class Routine(db.Model):
     __tablename__= "routines"
-    id = db.column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
 

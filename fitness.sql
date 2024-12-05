@@ -45,7 +45,7 @@ CREATE TABLE logs(
 CREATE TABLE routines(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
-    name VARCHAR(20) NOT NULL,
+    name TEXT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 

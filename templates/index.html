@@ -51,8 +51,8 @@
         elements.yearElement.addEventListener("change", function() {
             updateDays(elements);  // Update the days when the year changes
         });
+        document.addEventListener("DOMContentLoaded", get_routines);
     };
-    document.addEventListener("DOMContentLoaded", get_routines);
 
     document.getElementById("add-exercise").addEventListener("click", function() {
     const exerciseContainer = document.getElementById("add-exercise-container");
@@ -63,8 +63,8 @@
         // Call addExercise to populate the datalist and input
         addExercise(newExerciseDiv).then(() => {
             // After the datalist is populated, add weight and reps input fields
-            addInputField("weight", "lbs", newExerciseDiv, "short-input");
-            addInputField("reps", "reps", newExerciseDiv, "short-input");
+            addCompanionInput("weight", "lbs", newExerciseDiv, "short-input");
+            addCompanionInput("reps", "reps", newExerciseDiv, "short-input");
 
             // Append the new exercise div to the container
             exerciseContainer.appendChild(newExerciseDiv);

@@ -167,17 +167,17 @@ function addExercise(newExerciseDiv) {
 }
 
 
-function addInputField(companion, placeholder, newDiv, cssClass) {
-    const companionInput = document.createElement("input");
+function addInput(companion, placeholder, newDiv, cssClass) {
+    const input = document.createElement("input");
 
     // Set attributes for the input
-    companionInput.setAttribute("type", "text");
-    companionInput.setAttribute("name", `${companion}s[]`);  // Using template literals to create dynamic name
-    companionInput.setAttribute("placeholder", `${placeholder}`);
+    input.setAttribute("type", "text");
+    input.setAttribute("name", `${companion}s[]`);  // Using template literals to create dynamic name
+    input.setAttribute("placeholder", `${placeholder}`);
 
     // Add the passed cssClass to the input to adjust width
-    companionInput.classList.add(cssClass);
+    input.classList.add(cssClass);
 
     // Append the new input field to the div
-    newDiv.appendChild(companionInput);
+    newDiv.appendChild(input);
 }

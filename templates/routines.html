@@ -6,52 +6,63 @@
 
 {% block main %}
 <form action='/' method='post'>
-    <label for="routine-name">Routine Name</label>
-    <input type='text' id='routine-name' name='routine-name' placeholder='routine name' class="exercise-input" required>
-    <div id="exercise-container">
-        <div class="exercise-entry">
-            <label for="exercise">Exercise</label>
-            <input list="exercise-list" name="exercise" id="exercise-input" class="exercise-input" placeholder="exercise">
-            <datalist id="exercise-list">
-                {% for exercise in exercises_list %}
-                    <option value="{{ exercise }}"></option>                
-                {% endfor %}
-            </datalist>
-            <label for="sets">Sets</label>
-            <input name="sets" type="text" id="sets" placeholder="sets" class="short-input">
-        </div>
-    </div>
+    <button type="button" id="create-routine">Create Routine</button>
+    <div id="create-routine-container"></div>
     <!-- Dynamic fields for exercises and sets -->
     <div id="add-exercise-container">
         <!-- Initial exercise and set fields will be displayed here -->
     </div>
-    <!-- Button to add more exercises if superset is selected -->
-    <button type="button" id="add-exercise">Add Exercise</button>
-
     <!-- Submit button -->
     <button type="submit">Submit Routine</button>
 </form>
 
 <script>
-    document.getElementById("add-exercise").addEventListener("click", function() {
-    const exerciseContainer = document.getElementById("add-exercise-container");
-    if (exerciseContainer) {
-        // Create a new div for the exercise entry
-        const newExerciseDiv = document.createElement("div");
-        newExerciseDiv.classList.add("exercise-entry");
+document.getElementById("create-routine").addEventListener("click", function() {
+    const routineContainer = document.getElementById("create-routine-container");
 
-        // Call addExercise to populate the datalist and input
-        addExercise(newExerciseDiv).then(() => {
-            // After the datalist is populated, add weight and reps input fields
-            addInputField("sets", "sets", newExerciseDiv, "short-input");
+    if (routineContainer) {
+        // Create a new div for the routine entry
+        const routineDiv = document.createElement("div");
 
-            // Append the new exercise div to the container
-            exerciseContainer.appendChild(newExerciseDiv);
-        }).catch(error => {
-            console.error('Error fetching exercise data:', error);
+        // Add input for the routine name to the routineDiv
+        routineDiv.innerHTML = `<label for="routine-name">Routine Name</label>`
+        addInput("routine", "routine name", routineDiv, "exercise-input");
+
+        // Create the "Add Exercise" button
+        const addExerciseButton = document.createElement("button");
+        addExerciseButton.textContent = "Add Exercise";  // Set button text
+        addExerciseButton.id = "add-exercise";  // Optionally, give it an ID for styling
+        addExerciseButton.type = "button";  // Prevent form submission on click
+
+        // Append the Add Exercise button to the routineDiv
+        routineDiv.appendChild(addExerciseButton);
+
+        // Append the new routineDiv to the container
+        routineContainer.appendChild(routineDiv);
+
+        // Attach the event listener for "Add Exercise" after it's added to the DOM
+        addExerciseButton.addEventListener("click", function() {
+            const exerciseContainer = document.getElementById("add-exercise-container");
+            
+            if (exerciseContainer) {
+                // Create a new div for the exercise entry
+                const newExerciseDiv = document.createElement("div");
+                newExerciseDiv.classList.add("exercise-entry");
+
+                // Add exercise inputs (e.g., exercise name, sets)
+                addExercise(newExerciseDiv).then(() => {
+                    // After populating the exercise datalist, add input for sets
+                    addInput("sets", "sets", newExerciseDiv, "short-input");
+                    // Append the new exercise div to the container
+                    exerciseContainer.appendChild(newExerciseDiv);
+                }).catch(error => {
+                    console.error('Error fetching exercise data:', error);
+                });
+            }
         });
     }
 });
+
 </script>
 
 {% endblock %}
