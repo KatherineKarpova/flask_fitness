@@ -1,40 +1,40 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Record
+    record
 {% endblock %}
 
 {% block main %}
 <form action="/" method="post">
-    <label for="entry-date">Date</label>
+    <label for="entry-date">date</label>
     <div id="entry-date"></div>
-    <select id="routine-select" name="routine" placeholder="follow a routine"></select>
-    <option></option>
+    <div id="routine-select"></div>
     <div id="exercise-container">
         <div class="exercise-entry">
-            <label for="exercise">Exercise</label>
-            <input list="exercise-list" name="exercise" id="exercise-input" class="exercise-input" placeholder="exercise">
+            <label for="exercise">exercise</label>
+            <input list="exercise-list" name="exercise" id="exercise-input" class="long-input" placeholder="exercise">
             <datalist id="exercise-list">
                 {% for exercise in exercises %}
                     <option value="{{ exercise }}"></option>                
                 {% endfor %}
             </datalist>
-            <label for="weight">Weight</label>
-            <input name="weight" type="text" id="weight" placeholder="lbs" value="{{ weight }}" class="short-input">
+            <label for="weight">weight</label>
+            <input name="weight" type="text" id="weight" placeholder="lbs" class="short-input">
 
-            <label for="reps">Reps</label>
-            <input name="reps" type="text" id="reps" placeholder="reps" value="{{ reps }}" class="short-input">
+            <label for="reps">reps</label>
+            <input name="reps" type="text" id="reps" placeholder="reps" class="short-input">
         </div>
     </div>
-    <!-- Container for dynamically added exercise fields -->
+    <!-- container for dynamically added exercise fields -->
     <div id="add-exercise-container"></div>
 
-    <button type="button" id="add-exercise">Add Exercise</button>
-    <button type="submit">Record your workout!</button>
+    <button type="button" id="add-exercise">add exercise</button>
+    <button type="submit">record your workout!</button>
 </form>
 
 <script>
     window.onload = function() {
+        console.log("script loaded");
         const formId = "entry-date";
         dateForm(formId);
         const elements = defineDateElements(formId);
@@ -42,38 +42,39 @@
         updateDays(elements);
         setToday(elements);
 
-        // Add event listeners to trigger the updateDays function when month or year changes
+        // add event listeners to trigger the updateDays function when month or year changes
         elements.monthElement.addEventListener("change", function() {
             updateDays(elements);
         });
 
-        // Update the days when the month changes
+        // update the days when the month changes
         elements.yearElement.addEventListener("change", function() {
-            updateDays(elements);  // Update the days when the year changes
+            updateDays(elements);  // update the days when the year changes
         });
-        document.addEventListener("DOMContentLoaded", get_routines);
+        routineSelect();
     };
 
     document.getElementById("add-exercise").addEventListener("click", function() {
     const exerciseContainer = document.getElementById("add-exercise-container");
-        // Create a new div for the exercise entry
+        // create a new div for the exercise entry
         const newExerciseDiv = document.createElement("div");
         newExerciseDiv.classList.add("exercise-entry");
 
-        // Call addExercise to populate the datalist and input
+        // call addExercise to populate the datalist and input
         addExercise(newExerciseDiv).then(() => {
-            // After the datalist is populated, add weight and reps input fields
-            addCompanionInput("weight", "lbs", newExerciseDiv, "short-input");
-            addCompanionInput("reps", "reps", newExerciseDiv, "short-input");
+            // after the datalist is populated, add weight and reps input fields
+            addInputList("weight", "lbs", newExerciseDiv, "short-input");
+            addInputList("reps", "reps", newExerciseDiv, "short-input");
 
-            // Append the new exercise div to the container
+            // append the new exercise div to the container
             exerciseContainer.appendChild(newExerciseDiv);
         }).catch(error => {
-            console.error('Error fetching exercise data:', error);
+            console.error('error fetching exercise data:', error);
         });
     });
 </script>
 {% endblock %}
+
 
 
 

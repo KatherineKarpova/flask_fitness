@@ -1,60 +1,111 @@
-// Function to get routine names and populate the select options
-function get_routines() {
-    // Fetch the routine data from the Flask backend
+
+// html to create select menu for existing routines
+function routineSelect() {
+    const routineSelectcontainer = document.getElementById("routine-select");
+    if (routineSelectcontainer) {
+        // create the select element
+        const selectElement = document.createElement("select");
+        selectElement.id = "routine-select";
+        selectElement.name = "routine";
+        selectElement.classList.add("routine-select");
+
+        // create the default "select a routine" option
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "follow a routine";
+        selectElement.appendChild(defaultOption);
+
+        // append the select element to the container
+        routineSelectcontainer.appendChild(selectElement);
+
+        // fetch the routines and populate the select options
+        getRoutines(); 
+    }
+}
+
+// function to fetch routines from the server and populate the select menu
+function getRoutines() {
+    // fetch the routine data from the flask backend
     fetch("/routine_names")
-        .then(response => response.json()) // Parse JSON response
+        .then(response => response.json())  // parse json response
         .then(routines => {
-            // Get the select element where options will be added
-            const select = document.getElementById('routine-select');  // Adjust the ID if needed
+            console.log(routines); 
 
-            // Clear any existing options first to prevent duplicates
-            select.innerHTML = '';
+            // get the select element by id
+            const select = document.getElementById("routine-select");
 
-            // Add the default "Select a routine" option
-            const defaultOption = document.createElement('option');
-            defaultOption.text = 'follow a routine';
-            select.appendChild(defaultOption);
-
-            // Loop through the routine names and create an option for each
+            // loop through the routine names and create an option for each
             routines.forEach(routine => {
-                const option = document.createElement('option');
-                option.value = routine;  // Set the routine name as the value
-                option.textContent = routine; // Set the routine name as the displayed text
-                select.appendChild(option);  // Append the option to the select element
+                const option = document.createElement("option");
+                option.value = routine;  // set the routine name as the value
+                option.textContent = routine; // set the routine name as the displayed text
+                select.appendChild(option);  // append the option to the select element
             });
         })
         .catch(error => {
-            console.error("Error fetching routine names:", error);
+            console.error("error fetching routine names:", error);
         });
 }
 
-// Helper function to return the list of months (name only)
+
+
+function getRoutines() {
+        // fetch the routine data from the flask backend
+        fetch("/routine_names")
+            .then(response => response.json()) // parse json response
+            .then(routines => {
+                console.log(routines); 
+                // get the select element where options will be added
+                const select = document.getElementById("routine-select");  // adjust the id if needed
+
+                // clear any existing options first to prevent duplicates
+                select.innerHTML = "";
+
+                // add the default "select a routine" option
+                const defaultOption = document.createElement("option");
+                defaultOption.text = "follow a routine";
+                select.appendChild(defaultOption);
+
+                // loop through the routine names and create an option for each
+                routines.forEach(routine => {
+                    const option = document.createElement("option");
+                    option.value = routine;  // set the routine name as the value
+                    option.textContent = routine; // set the routine name as the displayed text
+                    select.appendChild(option);  // append the option to the select element
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching routine names:", error);
+            });
+    }
+
+// helper function to return the list of months (name only)
 function months() {
     return [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
     ];
 };
 
-// Inner HTML for date form
+// inner html for date form
 function dateForm(formId) {
     const formContainer = document.getElementById(formId);
     if (formContainer) {
-        // Construct the HTML dynamically using JavaScript
+        // construct the html dynamically using javascript
         formContainer.innerHTML = `
-            <select id='month-${formId}' name='month-${formId}' class="month">
-                ${months().map((month, index) => `<option value='${index + 1}'>${month}</option>`).join('')}
+            <select id="month-${formId}" name="month-${formId}" class="month">
+                ${months().map((month, index) => `<option value="${index + 1}">${month}</option>`).join("")}
             </select>
-            <select id='day-${formId}' name='day-${formId}' class="day"></select>
-            <select id='year-${formId}' name='year-${formId}' class="year"></select>
+            <select id="day-${formId}" name="day-${formId}" class="day"></select>
+            <select id="year-${formId}" name="year-${formId}" class="year"></select>
         `;
-        // After rendering the form, populate the year and day fields
+        // after rendering the form, populate the year and day fields
     } else {
-        console.error(`Element with id '${formId}' not found`);
+        console.error(`element with id "${formId}" not found`);
     }
 };
 
-// Define elements with unique id from HTML
+// define elements with unique id from html
 function defineDateElements(formId) {
     const monthElement = document.getElementById(`month-${formId}`);
     const dayElement = document.getElementById(`day-${formId}`);
@@ -62,122 +113,125 @@ function defineDateElements(formId) {
     return { monthElement, dayElement, yearElement };
 };
 
-// Update the number of days based on the selected month and year
+// update the number of days based on the selected month and year
 function updateDays(elements) {
     const month = parseInt(elements.monthElement.value, 10);
     const year = parseInt(elements.yearElement.value, 10);
 
-    // Ensure that the month and year are valid before proceeding
+    // ensure that the month and year are valid before proceeding
     if (isNaN(month) || isNaN(year)) {
         return;
     }
 
-    // Find the number of days in the selected month/year
+    // find the number of days in the selected month/year
     const daysInMonth = new Date(year, month, 0).getDate();
 
-    // Clear the existing day options
-    elements.dayElement.innerHTML = '';
+    // clear the existing day options
+    elements.dayElement.innerHTML = "";
 
-    // Populate the day dropdown with the correct number of days based on month/year
+    // populate the day dropdown with the correct number of days based on month/year
     for (let day = 1; day <= daysInMonth; day++) {
-        const paddedDay = day < 10 ? '0' + day : day; // Ensure days are zero-padded if necessary
-        const option = document.createElement('option');
+        const paddedDay = day < 10 ? "0" + day : day; // ensure days are zero-padded if necessary
+        const option = document.createElement("option");
         option.value = paddedDay;
         option.textContent = paddedDay;
         elements.dayElement.appendChild(option);
     }
 };
 
-// Populate the year dropdown with a range of years (e.g., current year to next 10 years)
+// populate the year dropdown with a range of years (e.g., current year to next 10 years)
 function populateYearDropdown(elements) {
     const currentYear = new Date().getFullYear();
     const years = [];
 
-    // Populate with 10 years forward from the current year
+    // populate with 10 years forward from the current year
     for (let i = 0; i < 5; i++) {
         years.push(currentYear - i);
     }
 
-    // Clear the year dropdown before populating
-    elements.yearElement.innerHTML = '';
+    // clear the year dropdown before populating
+    elements.yearElement.innerHTML = "";
 
-    // Add options to the year dropdown
+    // add options to the year dropdown
     years.forEach(year => {
-        const option = document.createElement('option');
+        const option = document.createElement("option");
         option.value = year;
         option.textContent = year;
         elements.yearElement.appendChild(option);
     });
 };
 
-// Set today's date in the form (for default selection)
+// set today's date in the form (for default selection)
 function setToday(elements) {
     const today = new Date();
 
-    // Set the current month, day, and year
-    elements.monthElement.value = today.getMonth() + 1; // Months are zero-based, so add 1
+    // set the current month, day, and year
+    elements.monthElement.value = today.getMonth() + 1; // months are zero-based, so add 1
     // elements.dayElement.value = today.getDate();
     elements.yearElement.value = today.getFullYear();
-    const paddedDay = today.getDate() < 10 ? '0' + today.getDate() : today.getDate();
+    const paddedDay = today.getDate() < 10 ? "0" + today.getDate() : today.getDate();
     elements.dayElement.value = paddedDay;
 }; 
+
 // add exercise input with a datalist of names via json return
 function addExercise(newExerciseDiv) {
     return new Promise((resolve, reject) => {
-        // Create the input field for exercise
+        // create the input field for exercise
         const exerciseInput = document.createElement("input");
-        const datalistId = "exercise-list-" + new Date().getTime(); // Unique id for each datalist
-        exerciseInput.setAttribute("list", datalistId);  // Link the input field with the unique datalist
-        exerciseInput.setAttribute("name", "exercise");
-        exerciseInput.setAttribute("class", "exercise-input");
+        const datalistId = "exercise-list-" + new Date().getTime(); // unique id for each datalist
+        exerciseInput.setAttribute("list", datalistId);  // link the input field with the unique datalist
+        exerciseInput.setAttribute("name", "exercises[]");
+        exerciseInput.setAttribute("class", "long-input");
         exerciseInput.setAttribute("placeholder", "exercise");
 
-        // Add the input element to the new div
+        // add the input element to the new div
         newExerciseDiv.appendChild(exerciseInput);
 
-        // Create a datalist and set a unique id
+        // create a datalist and set a unique id
         const datalist = document.createElement("datalist");
         datalist.setAttribute("id", datalistId);
 
-        // Fetch the exercise data from the Flask backend
+        // fetch the exercise data from the flask backend
         fetch("/json_exercises")
             .then(response => response.json())
             .then(exercises => {
-                // Clear any existing options
-                datalist.innerHTML = '';
+                // clear any existing options
+                datalist.innerHTML = "";
 
-                // Populate the datalist with options from the exercises array
+                // populate the datalist with options from the exercises array
                 exercises.forEach(exercise => {
-                    const option = document.createElement('option');
-                    option.value = exercise;  // The value is the exercise name
+                    const option = document.createElement("option");
+                    option.value = exercise;  // the value is the exercise name
                     datalist.appendChild(option);
                 });
 
-                // Now append the datalist to the new exercise div (after it has been populated)
+                // now append the datalist to the new exercise div (after it has been populated)
                 newExerciseDiv.appendChild(datalist);
 
-                // Ensure the Promise is resolved only after the datalist is appended
+                // ensure the promise is resolved only after the datalist is appended
                 resolve();
             })
             .catch(error => {
-                console.error('Error fetching exercise data:', error);
+                console.error("error fetching exercise data:", error);
                 reject(error);
             });
     });
 }
 
-
-function addInput(companion, placeholder, newDiv, cssClass) {
+// input field to have in exercise containers
+// placeholder parameter because i want the weight input to say lbs not weight
+function addInputList(companion, placeholder, newDiv, cssClass) {
     const input = document.createElement("input");
 
-    // Set attributes for the input
-    input.setAttribute("type", "text");
-    input.setAttribute("name", `${companion}s[]`);  // Using template literals to create dynamic name
+    // set attributes for the input
+    input.setAttribute("type", "number");
+    input.setAttribute("name", `${companion}[]`);  // using template literals to create dynamic name
     input.setAttribute("placeholder", `${placeholder}`);
 
-    // Add the passed cssClass to the input to adjust width
+    // add the passed cssClass to the input to adjust width
     input.classList.add(cssClass);
 
-    // Append the new input field to the div
+    // append the new input field to the div
     newDiv.appendChild(input);
 }
+
