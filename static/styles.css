@@ -158,8 +158,7 @@ button:focus {
 }
 
 /* style for select menus (month, day, year) */
-select {
-    width: 150px;   /* same width as short-input fields */
+select {   /* same width as short-input fields */
     height: 50px;   /* same height */
     border: 2px solid #ff4c8b; /* same border style */
     border-radius: 25px; /* rounded corners like the other inputs */
@@ -169,7 +168,9 @@ select {
     color: #6d0041; /* deep berry purple text */
     transition: border-color 0.3s ease;
 }
-
+.routine-select{
+    width: 200px;
+}
 select:focus {
     border-color: #f91c75; /* border color when focused */
     box-shadow: 0 0 10px rgba(249, 28, 117, 0.3); /* light pink glow when focused */

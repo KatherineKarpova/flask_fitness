@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Exercise(db.Model):
-    __tablename__ = 'exercises'
+    __tablename__ = "exercises"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     type = db.Column(db.String(100), nullable=False)
@@ -15,3 +15,12 @@ class Routine(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, nullable=False)
+
+class Log(db.Model):
+    __tablename__ = "logs"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.String(50), nullable=False)
+    exercise_id = db.Column(db.Integer, nullable=False)
+    weight = db.Column(db.Integer, nullable=False)
+    reps = db.Column(db.Integer, nullable=False)

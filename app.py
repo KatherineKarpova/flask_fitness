@@ -9,6 +9,12 @@ from functools import wraps
 import hashlib
 from email_validator import validate_email, EmailNotValidError
 from models import db
+import pandas
+import base64
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plot
+import io
 
 # initialize flask app
 app = Flask(__name__)
@@ -26,8 +32,91 @@ app.config.from_object(Config)
 # initialize flask session
 Session(app)
 
+@app.route("/strength", methods=["GET"])
+@login_required
+def strength():
+    conn, c = sqlite3_conn()  # establish a connection to the database
+    graphs = {}  # dictionary where key = exercise name and value = line graph
+
+    # sql query to get the strength data (weights and dates)
+    exercises = c.execute("""SELECT DISTINCT exercises.name AS exercise
+                              FROM exercises
+                              JOIN logs ON exercises.id = logs.exercise_id
+                              WHERE logs.user_id = ?
+                              AND logs.weight != 0
+                              """, (session["user_id"],)).fetchall()
+
+    for row in exercises:
+        exercise = row["exercise"]
+        # convert the data into a pandas dataframe for easier plotting
+        strength_data = c.execute("""SELECT MAX(logs.weight) AS highest_weight, logs.date
+                                  FROM logs
+                                  JOIN exercises ON logs.exercise_id = exercises.id
+                                  WHERE exercises.name = ? AND logs.user_id = ?
+                                  GROUP BY logs.date
+                                  ORDER BY logs.date DESC
+                                  """, (exercise, session["user_id"])).fetchall()
+        
+        dataframe = pandas.DataFrame(strength_data, columns=["weight", "date"])
+
+        # create a plot using matplotlib
+        plot.figure(figsize=(10, 6))
+        dataframe["date"] = pandas.to_datetime(dataframe["date"])  # convert date column to datetime
+
+        # plot the graph
+        plot.plot(dataframe["date"], dataframe["weight"], color="skyblue")
+        plot.xlabel("Date")
+        plot.ylabel("Weight")
+        plot.title(f"Strength Stats for {exercise}")
+
+        # save the plot to a BytesIO object to send it as an image
+        img = io.BytesIO()
+        plot.savefig(img, format="png")
+        img.seek(0)
+
+        # encode the image to base64 for embedding in the html template
+        graphs[exercise] = base64.b64encode(img.getvalue()).decode('utf8')
+
+    conn.close()  # close the database connection
+    return render_template("strength.html", graphs=graphs)  # render the template and pass the graphs dictionary
+
+
+
+@app.route("/full_routine", methods=["GET", "POST"])
+@login_required
+def full_routine():
+    # get selected routine
+    routine_name = request.form.get("routine_name")
+
+    if routine_name:
+        conn, c = sqlite3_conn()
+        # join the three tables and fetch name of exercises and num sets
+        routine = c.execute("""
+            SELECT exercises.name AS exercise_name, routine_exercises.sets AS sets
+            FROM exercises
+            JOIN routine_exercises ON exercises.id = routine_exercises.exercise_id
+            JOIN routines ON routine_exercises.routine_id = routines.id
+            WHERE routines.name = ? AND routines.user_id = ?
+            """, (routine_name, session["user_id"])).fetchall()
+        conn.close()
+
+        # Check if any results are returned
+        if routine:
+            # Return the results as a list of dictionaries
+            routine_data = [{
+                'exercise_name': row['exercise_name'],
+                'sets': row['sets'],
+            }for row in routine]
+            print(routine_data)
+            return jsonify(routine_data)  # Return data as JSON
+        else:
+            return jsonify({"error": "routine not found"}), 404
+
+    return jsonify({"error": "no routine selected"}), 400
+
 # get exercise names with json to use with js
 @app.route("/json_exercises", methods=["GET"])
+@login_required
 def json_exercises():
     exercises = exercise_names()
     return jsonify(exercises)
@@ -54,41 +143,63 @@ def routine_names():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    conn, c = sqlite3_conn()
-    # get all exercises from db for datalist options
-    exercises = exercise_names()
+    exercises = exercise_names()  # get all exercises from db for datalist options
+
     if request.method == "POST":
+        print(request.form)
+        # get date values from the form
         month, day, year = get_date_values("entry-date")
         date = format_date(month, day, year)
+
         # get exercise id to insert based on name from exercise selected from input field
         exercises_list = request.form.getlist("exercises[]")
         weights_list = request.form.getlist("weights[]")
         reps_list = request.form.getlist("reps[]")
+
+        print(f"Exercises: {exercises_list}")
+        print(f"Weights: {weights_list}")
+        print(f"Reps: {reps_list}")
+
         # loop over each exercise and corresponding set value
         for exercise, weight, reps in zip(exercises_list, weights_list, reps_list):
-            # get exercise id from the exercise name (assuming `get_exercise_id` works correctly)
-            exercise_id = get_exercise_id(exercise)
-            # only proceed if the exercise_id was found
-            if exercise_id is not None:
-                try:
-                    # insert the log entry into the database
-                    c.execute("""INSERT INTO logs (user_id, date, exercise_id, weight, reps)
-                                 VALUES (?, ?, ?, ?, ?)""",
-                              (session["user_id"], date, exercise_id, weight, reps))
-                except Exception as e:
-                    # handle the exception, flash an error message
-                    flash(f"error logging set: {str(e)}", "danger")
-                    # deciding not to do c.rollback() so valid sets are logged even if some are not found
-                    break
-        else:
-            # only commit if no errors occurred
-            conn.commit()
-        conn.close()
-        flash("set logged!", "success")
+            try:
+                exercise_id = get_exercise_id(exercise)  # get exercise id based on exercise name
+                if exercise_id is None:
+                    flash(f"Exercise '{exercise}' not found", "danger")
+                    continue  # skip this entry if exercise id is not found
+
+                # create a new log entry
+                new_log = Log(
+                    user_id=session["user_id"],  # assuming you're using flask-login for user session
+                    date=date,
+                    exercise_id=exercise_id,
+                    weight=try_int(weight, 0),
+                    reps=try_int(reps, 0)
+                )
+
+                # add the new log entry to the session
+                db.session.add(new_log)
+
+            except Exception as e:
+                # handle the exception, flash an error message
+                flash(f"Error logging set for {exercise}: {str(e)}", "danger")
+                db.session.rollback()  # rollback any changes made if there's an error
+                continue  # continue to the next iteration if an error occurs
+
+        try:
+            db.session.commit()  # commit all changes to the database
+            flash("Sets logged successfully!", "success")
+        except Exception as e:
+            db.session.rollback()  # rollback changes if commit fails
+            flash(f"Error committing the data: {str(e)}", "danger")
+
+        conn.close()  # close the database connection if using sqlite3
+
         # re-render the form with the previous values filled in
-        # have list of exercises pass for the dropdown menu
         return render_template("index.html", exercises=exercises)
+
     return render_template("index.html", exercises=exercises)
+
 
 @app.route("/routines", methods=["GET", "POST"])
 @login_required

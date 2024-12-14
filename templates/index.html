@@ -8,24 +8,26 @@
 <form action="/" method="post">
     <label for="entry-date">date</label>
     <div id="entry-date"></div>
-    <div id="routine-select"></div>
-    <div id="exercise-container">
-        <div class="exercise-entry">
-            <label for="exercise">exercise</label>
-            <input list="exercise-list" name="exercise" id="exercise-input" class="long-input" placeholder="exercise">
-            <datalist id="exercise-list">
-                {% for exercise in exercises %}
-                    <option value="{{ exercise }}"></option>                
-                {% endfor %}
-            </datalist>
-            <label for="weight">weight</label>
-            <input name="weight" type="text" id="weight" placeholder="lbs" class="short-input">
+    <select id="routine-select" name="routine" placeholder="routine-name" class="routine-select"></select>
+    <div id="routine-table-container"></div>
+        <div id="exercise-container">
+            <div class="exercise-entry">
+                <label for="exercise">exercise</label>
+                <input list="exercise-list" name="exercises[]" id="exercise-input" class="long-input" placeholder="exercise">
+                <datalist id="exercise-list">
+                    {% for exercise in exercises %}
+                        <option value="{{ exercise }}"></option>
+                    {% endfor %}
+                </datalist>
+                <label for="weight">weight</label>
+                <input name="weights[]" type="text" id="weight" placeholder="lbs" class="short-input">
 
-            <label for="reps">reps</label>
-            <input name="reps" type="text" id="reps" placeholder="reps" class="short-input">
+                <label for="reps">reps</label>
+                <input name="reps[]" type="text" id="reps" placeholder="reps" class="short-input">
+            </div>
         </div>
-    </div>
-    <!-- container for dynamically added exercise fields -->
+
+    <!-- dynamically added exercises -->
     <div id="add-exercise-container"></div>
 
     <button type="button" id="add-exercise">add exercise</button>
@@ -51,27 +53,37 @@
         elements.yearElement.addEventListener("change", function() {
             updateDays(elements);  // update the days when the year changes
         });
-        routineSelect();
+        getRoutines();
     };
 
     document.getElementById("add-exercise").addEventListener("click", function() {
     const exerciseContainer = document.getElementById("add-exercise-container");
-        // create a new div for the exercise entry
-        const newExerciseDiv = document.createElement("div");
-        newExerciseDiv.classList.add("exercise-entry");
 
-        // call addExercise to populate the datalist and input
-        addExercise(newExerciseDiv).then(() => {
-            // after the datalist is populated, add weight and reps input fields
-            addInputList("weight", "lbs", newExerciseDiv, "short-input");
-            addInputList("reps", "reps", newExerciseDiv, "short-input");
+    // create a new div for the exercise entry
+    const newExerciseDiv = document.createElement("div");
+    newExerciseDiv.classList.add("exercise-entry");
 
-            // append the new exercise div to the container
-            exerciseContainer.appendChild(newExerciseDiv);
-        }).catch(error => {
-            console.error('error fetching exercise data:', error);
-        });
+    // call addExercise to populate the datalist and input
+    addExercise(newExerciseDiv).then(() => {
+        // after the datalist is populated, add weight and reps input fields
+        addInputList("weight", "lbs", newExerciseDiv, "short-input");
+        addInputList("reps", "reps", newExerciseDiv, "short-input");
+
+        // append the new exercise div to the container
+        exerciseContainer.appendChild(newExerciseDiv);
+    }).catch(error => {
+        console.error('error fetching exercise data:', error);
     });
+});
+
+    // event listener for when a routine is selected from the dropdown
+    document.getElementById("routine-select").addEventListener("change", function() {
+        // this.value will get whatever value is selected 
+        const routineName = this.value;
+        if (routineName) {
+            fullRoutine(routineName);  // fetch routine data when a routine is selected
+        }
+});
 </script>
 {% endblock %}
 

@@ -7,8 +7,18 @@ from email_validator import validate_email, EmailNotValidError
 from models import *
 
 
+def try_int(str, response):
+    try:
+        str = int(str)
+    except ValueError:
+        str = response
+    finally:
+        return str
+# reducing lines for each time I connect to the db and use a cursor
 def sqlite3_conn():
     conn = sqlite3.connect("fitness.db")
+    # making sqlite3 queries able to create data as a JSON response
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
     return conn, c
 
@@ -50,21 +60,15 @@ def get_form_int(field):
     
 # query db to get exercise_id based on name
 def get_exercise_id(exercise):
-    # establish database connection
-    conn, c = sqlite3_conn()
-    try:
-        # query the exercise id
-        exercise_id = c.execute("""SELECT id FROM exercises WHERE name = ?""", (exercise,)).fetchone()
-        
+    # use exercise name to find exercise id easily
+    exercise = Exercise.query.filter_by(name=exercise).first()
+    # check if an exercise was found
+    if exercise is None:
+        flash(f"Exercise '{exercise}' not found.", "danger") #inform user of error
+        raise ValueError("Exercise '{exercise}' not found.") # raise the error
         # check if an exercise was found
-        if exercise_id is None:
-            flash(f"Exercise '{exercise}' not found.", "danger")  # provide more detail in flash message
-            return None
-        return exercise_id[0]
-# return the exercise ID (the first element of the tuple)
-    except Exception as e:
-        flash(f"An error occurred while retrieving the exercise: {str(e)}", "danger")
-        return None
+    # return the exercise id
+    return exercise.id
 
 # get an individual routine, with exercise names and number of sets, based on routine name
 def get_routine():

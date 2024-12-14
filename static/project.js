@@ -1,28 +1,63 @@
-
-// html to create select menu for existing routines
-function routineSelect() {
-    const routineSelectcontainer = document.getElementById("routine-select");
-    if (routineSelectcontainer) {
-        // create the select element
-        const selectElement = document.createElement("select");
-        selectElement.id = "routine-select";
-        selectElement.name = "routine";
-        selectElement.classList.add("routine-select");
-
-        // create the default "select a routine" option
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.textContent = "follow a routine";
-        selectElement.appendChild(defaultOption);
-
-        // append the select element to the container
-        routineSelectcontainer.appendChild(selectElement);
-
-        // fetch the routines and populate the select options
-        getRoutines(); 
-    }
+// get the exercises and corresponding sets from the backend for selected routine
+function fullRoutine(routineName) {
+    // routine data from the backend
+    fetch('/full_routine', {
+        method: 'POST',
+        body: new URLSearchParams({
+            'routine_name': routineName
+        }),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+    .then(response => response.json())  // the response should be JSON
+    .then(data => {
+        console.log('Routine Data:', data);
+        if (data.error) {
+            alert(data.error);  // show error message if routine not found
+        } else {
+            routineTable(data);  // display data if routine is found
+        }
+    })
+    .catch(error => {
+        console.error('error fetching routine data:', error);
+    });
 }
 
+// function to display routine data in an html table
+function routineTable(data) {
+    const routineContainer = document.getElementById('routine-table-container');
+    routineContainer.innerHTML = '';  // Clear any previous table data
+
+    const table = document.createElement('table');
+    table.classList.add('routine-table');
+
+    const header = table.createTHead();
+    const headerRow = header.insertRow();
+    headerRow.innerHTML = `
+        <th>exercise</th>
+        <th>sets</th>
+    `;
+
+    const body = table.createTBody();
+    data.forEach(row => {
+        const rowElement = body.insertRow();
+        rowElement.innerHTML = `
+            <td>${row.exercise_name}</td>
+            <td>${row.sets}</td>
+        `;
+    });
+
+    routineContainer.appendChild(table);
+}
+
+// reuse html to select routine 
+function routineSelect(){
+    const routineSelectcontainer = document.getElementById("routine-select");
+    if (routineSelectcontainer) {
+        routineSelectcontainer.innerHTML = `<select id="routine-select" name="routine" placeholder="routine-name" class="routine-select"></select>`;
+    }
+}
 // function to fetch routines from the server and populate the select menu
 function getRoutines() {
     // fetch the routine data from the flask backend
@@ -33,7 +68,14 @@ function getRoutines() {
 
             // get the select element by id
             const select = document.getElementById("routine-select");
-
+            // create a non-selectable default option
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";  // no value, placeholder only
+            defaultOption.textContent = "Follow a routine";  // placeholder text
+            defaultOption.disabled = true;  // disable it so it can't be selected
+            defaultOption.selected = true;  // set it as the default selected option
+            select.appendChild(defaultOption);  // append it to the select element
+           
             // loop through the routine names and create an option for each
             routines.forEach(routine => {
                 const option = document.createElement("option");
@@ -46,38 +88,6 @@ function getRoutines() {
             console.error("error fetching routine names:", error);
         });
 }
-
-
-
-function getRoutines() {
-        // fetch the routine data from the flask backend
-        fetch("/routine_names")
-            .then(response => response.json()) // parse json response
-            .then(routines => {
-                console.log(routines); 
-                // get the select element where options will be added
-                const select = document.getElementById("routine-select");  // adjust the id if needed
-
-                // clear any existing options first to prevent duplicates
-                select.innerHTML = "";
-
-                // add the default "select a routine" option
-                const defaultOption = document.createElement("option");
-                defaultOption.text = "follow a routine";
-                select.appendChild(defaultOption);
-
-                // loop through the routine names and create an option for each
-                routines.forEach(routine => {
-                    const option = document.createElement("option");
-                    option.value = routine;  // set the routine name as the value
-                    option.textContent = routine; // set the routine name as the displayed text
-                    select.appendChild(option);  // append the option to the select element
-                });
-            })
-            .catch(error => {
-                console.error("Error fetching routine names:", error);
-            });
-    }
 
 // helper function to return the list of months (name only)
 function months() {
@@ -225,7 +235,7 @@ function addInputList(companion, placeholder, newDiv, cssClass) {
 
     // set attributes for the input
     input.setAttribute("type", "number");
-    input.setAttribute("name", `${companion}[]`);  // using template literals to create dynamic name
+    input.setAttribute("name", `${companion}s[]`);  // using template literals to create dynamic name
     input.setAttribute("placeholder", `${placeholder}`);
 
     // add the passed cssClass to the input to adjust width

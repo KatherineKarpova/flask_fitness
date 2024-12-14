@@ -12,7 +12,9 @@
     <div id="add-exercise-container">
         <!-- initial exercise and set fields will be displayed here -->
     </div>
-    <button type="button" id="view-routines">View Routines</div>
+    <button type="button" id="view-routines">View Routines</button>
+    <div id="routine-select-container"></div>
+    <div id="routine-table-container"></div>
 </form>
 
 <script>
@@ -48,7 +50,7 @@ document.getElementById("create-routine").addEventListener("click", function() {
         routineDiv.appendChild(addExerciseButton);
 
         // append the new routineDiv to the container
-        routineContainer.appendChild(routineDiv);
+        createRoutineContainer.appendChild(routineDiv);
 
         // attach the event listener for "add exercise" after it's added to the dom
         addExerciseButton.addEventListener("click", function() {
@@ -70,9 +72,16 @@ document.getElementById("create-routine").addEventListener("click", function() {
                 });
             }
         });
-        // submit button to insert into db
-        <button id="create-routine" type="submit">create routine</button>
+
+        // Dynamically create and append the submit button
+        const submitButton = document.createElement("button");
+        submitButton.id = "create-routine";
+        submitButton.type = "submit";
+        submitButton.textContent = "create routine";
+
+        routineDiv.appendChild(submitButton);
     }
+
     document.getElementById("view-routines").addEventListener("click", function() {
         routineSelect();
         getRoutines();
@@ -81,3 +90,4 @@ document.getElementById("create-routine").addEventListener("click", function() {
 </script>
 
 {% endblock %}
+
