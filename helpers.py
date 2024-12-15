@@ -1,11 +1,27 @@
 import sqlite3
 import hashlib
-import datetime
+from datetime import datetime, date, timedelta
 from functools import wraps
 from flask import request, redirect, flash, session
 from email_validator import validate_email, EmailNotValidError
 from models import *
 
+
+def past_week_dates(ref_date):
+    # ref_date must be datetime object already
+    # get current day of the week as int where M-S is 0-6
+    weekday = ref_date.weekday()
+    # if ref_date is a saturday
+    if weekday == 5:
+        saturday = ref_date
+    # if not find most recent saturday prior
+    else:
+        days = weekday - 5 if weekday > 5 else weekday - 5
+        saturday = ref_date - timedelta(days=days)
+    print(saturday)
+    sunday = saturday - timedelta(days=6)
+    print(sunday)
+    return sunday, saturday
 
 def try_int(str, response):
     try:
@@ -27,7 +43,7 @@ def exercise_names():
     return [exercise.name for exercise in exercises]
 
 # get dates from a date form
-def get_date_values(form_id):
+def get_form_date(form_id):
     month = request.form.get(f"month-{form_id}").strip()
     day = request.form.get(f"day-{form_id}").strip()
     year = request.form.get(f"year-{form_id}").strip()
@@ -40,11 +56,12 @@ def get_date_values(form_id):
     except ValueError as e:
         # in case of invalid month or other issues
         raise ValueError(f"Invalid data provided: {str(e)}")
-    return month, day, year
+    date = datetime.date(year, month, day)
+    return date
 
-def format_date(month, day, year):
+def format_date(date):
     # format date as YYYY-MM-DD
-    return datetime.date(year, month, day).isoformat()
+    return date.isoformat()
 
 # get int value from form set to 0 if empty
 def get_form_int(field):

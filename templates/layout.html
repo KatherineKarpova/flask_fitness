@@ -28,8 +28,25 @@
                     <!-- Links for logged-in users -->
                     <ul class="navbar-nav me-auto mt-2">
                         <li class="nav-item"><a class="nav-link" href="/">Record</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/strength">Stats</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/routines">Routines</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Stats
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/strength">Strength</a></li>
+                                <li><a class="dropdown-item" href="/volume">Weekly Volume</a></li>
+                                <li><a class="dropdown-item" href="/load">Total Load</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Routines
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="/createRoutine">Create</a></li>
+                                <li><a class="dropdown-item" href="/editRoutine">Edit</a></li>
+                            </ul>
+                        </li>
                     </ul>
                     <!-- Log Out link for logged-in users -->
                     <ul class="navbar-nav ms-auto mt-2">

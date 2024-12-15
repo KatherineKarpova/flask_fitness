@@ -8,11 +8,13 @@
 <form action="/" method="post">
     <label for="entry-date">date</label>
     <div id="entry-date"></div>
-    <select id="routine-select" name="routine" placeholder="routine-name" class="routine-select"></select>
+    <div id="routine-select-container">
+        <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
+    </div>
     <div id="routine-table-container"></div>
         <div id="exercise-container">
             <div class="exercise-entry">
-                <label for="exercise">exercise</label>
+                <label for="exercises[]">Exercise</label>
                 <input list="exercise-list" name="exercises[]" id="exercise-input" class="long-input" placeholder="exercise">
                 <datalist id="exercise-list">
                     {% for exercise in exercises %}

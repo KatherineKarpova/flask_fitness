@@ -53,10 +53,11 @@ function routineTable(data) {
 
 // reuse html to select routine 
 function routineSelect(){
-    const routineSelectcontainer = document.getElementById("routine-select");
+    const routineSelectcontainer = document.getElementById("routine-select-container");
     if (routineSelectcontainer) {
-        routineSelectcontainer.innerHTML = `<select id="routine-select" name="routine" placeholder="routine-name" class="routine-select"></select>`;
+        routineSelectcontainer.innerHTML = `<select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>`;
     }
+
 }
 // function to fetch routines from the server and populate the select menu
 function getRoutines() {
@@ -71,7 +72,7 @@ function getRoutines() {
             // create a non-selectable default option
             const defaultOption = document.createElement("option");
             defaultOption.value = "";  // no value, placeholder only
-            defaultOption.textContent = "Follow a routine";  // placeholder text
+            defaultOption.textContent = "select a routine";  // placeholder text
             defaultOption.disabled = true;  // disable it so it can't be selected
             defaultOption.selected = true;  // set it as the default selected option
             select.appendChild(defaultOption);  // append it to the select element

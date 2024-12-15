@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    routines
+{% endblock %}
+
+{% block main %}
+<form action="/editRoutine" method="post">
+    <div id="routine-select-container"></div>
+    <div id="routine-table-container"></div>
+</form>
+
+<script>
+
+    window.onload = function() {
+        routineSelect();
+        getRoutines();
+    };
+</script>
+
+{% endblock %}

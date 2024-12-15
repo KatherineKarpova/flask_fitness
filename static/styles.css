@@ -5,6 +5,25 @@
     box-sizing: border-box;
 }
 
+/* Show dropdown menu when hovering over the parent */
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0;
+}
+
+/* Hide the dropdown by default (Bootstrap handles it with display: none) */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+}
+
+/* Optional: Add spacing between the items */
+.dropdown-menu .dropdown-item {
+    padding: 10px;
+    font-size: 14px;
+}
+
 /* body */
 body {
     font-family: "Arial", sans-serif;

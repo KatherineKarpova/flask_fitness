@@ -31,7 +31,32 @@ app.config.from_object(Config)
 
 # initialize flask session
 Session(app)
-
+ 
+@app.route("/volume", methods=["GET", "POST"])
+@login_required
+def volume():
+    # count num sets involving each muscle based on date range
+    # use date range of Sunday - Monday
+    sunday, saturday = past_week_dates(date.today())
+    sunday = format_date(sunday)
+    saturday = format_date(saturday)
+    conn, c = sqlite3_conn()
+    # count num of rows grouped by the muscle worked as prime mover
+    volume_data = c.execute("""SELECT COUNT(*) AS "sets", muscles.name AS "muscle"
+                            FROM muscles
+                            JOIN muscles_worked ON muscles.id = muscles_worked.muscle_id
+                            WHERE muscles_worked.role = "prime mover"
+                            AND muscles_worked.exercise_id IN(
+                                SELECT logs.exercise_id 
+                                FROM logs
+                                WHERE date BETWEEN ? AND ?
+                                AND logs.user_id = ?
+                            )
+                            GROUP BY muscles.id""", (sunday, saturday, session["user_id"],)).fetchall()
+    print(volume_data)
+    return render_template("/volume.html", volume_data=volume_data)
+    
+    
 @app.route("/strength", methods=["GET"])
 @login_required
 def strength():
@@ -148,8 +173,8 @@ def index():
     if request.method == "POST":
         print(request.form)
         # get date values from the form
-        month, day, year = get_date_values("entry-date")
-        date = format_date(month, day, year)
+        date = get_form_date("entry-date")
+        date = format_date(date)
 
         # get exercise id to insert based on name from exercise selected from input field
         exercises_list = request.form.getlist("exercises[]")
@@ -201,9 +226,9 @@ def index():
     return render_template("index.html", exercises=exercises)
 
 
-@app.route("/routines", methods=["GET", "POST"])
+@app.route("/createRoutine", methods=["GET", "POST"])
 @login_required
-def routines():
+def create_routine():
     conn, c = sqlite3_conn()  # assuming this function opens a connection to your sqlite db
     exercises = exercise_names()  # get the list of exercise names
 
@@ -253,7 +278,14 @@ def routines():
         return redirect("/")  # redirect to the main page or wherever necessary
 
     # if GET request, just render the routine form
-    return render_template("routines.html", exercises=exercises)
+    return render_template("createRoutine.html", exercises=exercises)
+
+@app.route("/editRoutine", methods=["GET", "POST"])
+@login_required
+def edit_routine():
+    #if request.method == "POST":
+
+    return render_template("/editRoutine.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

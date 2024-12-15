@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Weekly Volume
+{% endblock %}
+
+{% block main %}
+<form action="/stats" method="get">
+    <div id="volume-container">
+        {{  volume_data }}
+    </div>
+</form>
+{% endblock %}
