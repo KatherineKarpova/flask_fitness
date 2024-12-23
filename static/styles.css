@@ -5,34 +5,53 @@
     box-sizing: border-box;
 }
 
+label {
+    padding: 10px;
+    font-size: 23px;
+    color: #ff4c8b;        
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+h1 {
+    color: #890363; /* Sets the text color for links */
+    font-size: 20px;
+}
 /* Show dropdown menu when hovering over the parent */
 .nav-item.dropdown:hover .dropdown-menu {
-    display: block;
-    margin-top: 0;
-}
+    font-weight: bold;
+    }
 
 /* Hide the dropdown by default (Bootstrap handles it with display: none) */
 .dropdown-menu {
     display: none;
     position: absolute;
     z-index: 1000;
+    background-color: #ffffff;;
 }
 
 /* Optional: Add spacing between the items */
 .dropdown-menu .dropdown-item {
     padding: 10px;
-    font-size: 14px;
+    font-size: 20px;
+    color: #f91c75;        
+    font-weight: bold;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f91c75; /* Your desired hover background color */
+    color: #ffffff; /* Optional: Change text color for contrast */
 }
 
 /* body */
 body {
     font-family: "Arial", sans-serif;
-    background: linear-gradient(to right, #ff7b9f, #f3a6d6); /* light pink to pastel purple gradient */
+    background: linear-gradient(to right, #02f6c5, #f3a6d6); /* light pink to pastel purple gradient */
     color: #6d0041; /* deep berry purple text */
     line-height: 1.6;
     display: flex;
     justify-content: flex-start;
-    align-items: flex-start; /* align items to the top */
+    align-items: center; /* align items to the top */
     height: 100%;
     text-align: center;
     flex-direction: column;
@@ -44,22 +63,34 @@ body {
 nav {
     background-color: #ff4c8b; /* girly, bold pink */
     border-radius: 25px; /* rounded corners for a softer look */
-    padding: 10px 20px; /* increase padding for a larger navbar */
+    padding: 20px 30px; /* increase padding for a larger navbar */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* light shadow for depth */
 }
 
 .navbar-brand {
     font-size: 2em; /* bigger brand font */
     font-weight: bold;
-    color: #4f009a;
+    color: #f3a6d6;
+    text-shadow: 
+        -1px -1px 0 #f91c75, /* Top left shadow */
+        1px -1px 0 #f91c75,  /* Top right shadow */
+        -1px 1px 0 #f91c75,  /* Bottom left shadow */
+        1px 1px 0 #f91c75; 
     letter-spacing: 1px;
     text-transform: uppercase;
     font-family: "Arial", sans-serif;
 }
-
+.navbar-brand:hover {
+    color: #ff4c8b;
+    text-shadow: 
+        -1px -1px 0 , #f3a6d6/* Top left shadow */
+        1px -1px 0 #f3a6d6,  /* Top right shadow */
+        -1px 1px 0 #f3a6d6,  /* Bottom left shadow */
+        1px 1px 0 #f3a6d6; 
+}
 .navbar-nav .nav-link {
     font-size: 1.3em;  /* increase font size */
-    color: #fca4f1; /* white text for links */
+    color: #f91c75; /* white text for links */
     font-weight: bold;
     margin-right: 20px;
     padding: 8px 15px;
@@ -69,14 +100,14 @@ nav {
 }
 
 .navbar-nav .nav-link:hover {
-    background-color: #f91c75; /* light pink on hover */
-    color: #fff;
+    background-color: #f91c75;
+    color: #ffffff;
     transform: translateY(-2px); /* hover animation */
 }
 
 .navbar-toggler {
     border: none;
-    background-color: #fff; /* white background for the toggler */
+    background-color: #ffffff; /* white background for the toggler */
     border-radius: 50%; /* round toggle button */
 }
 
@@ -139,11 +170,12 @@ nav {
     background-color: #fff; /* white background for select */
     color: #6d0041; /* deep berry purple text */
     transition: border-color 0.3s ease;
+    text-align: center;
 }
 
 /* style for the weight and reps inputs (shorter and equal size) */
 .short-input {
-    width: 80px;   /* shorter */
+    width: 70px;   /* shorter */
     height: 40px;  /* same height */
     border: 2px solid #ff4c8b; /* same border style */
     border-radius: 25px; /* rounded corners like the other inputs */
@@ -152,6 +184,7 @@ nav {
     background-color: #fff; /* white background for select */
     color: #6d0041; /* deep berry purple text */
     transition: border-color 0.3s ease;
+    text-align: center;
 }
 
 /* buttons */
@@ -165,6 +198,7 @@ button, .btn {
     border: none;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, background-color 0.3s ease;
+    margin: 10px
 }
 
 button:hover, .btn:hover {
@@ -186,6 +220,7 @@ select {   /* same width as short-input fields */
     background-color: #fff; /* white background for select */
     color: #6d0041; /* deep berry purple text */
     transition: border-color 0.3s ease;
+    margin: 10px;
 }
 .routine-select{
     width: 200px;
@@ -208,6 +243,7 @@ select:focus {
     border: 2px solid #ff4c8b; /* same border style */
     border-radius: 25px; /* rounded corners like the other inputs */
     padding: 5px;
+    margin-top: 20px;
     margin-bottom: 20px;   /* padding for a comfortable space inside */
     font-size: 1 em; /* same font size */
     background-color: #fff; /* white background for select */

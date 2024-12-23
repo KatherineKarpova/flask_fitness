@@ -6,7 +6,6 @@
 
 {% block main %}
 <form action="/" method="post">
-    <label for="entry-date">date</label>
     <div id="entry-date"></div>
     <div id="routine-select-container">
         <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
@@ -16,98 +15,66 @@
         <div class="exercise-entry"></div>
     </div>
 
-    <!-- dynamically added exercises -->
     <div id="add-exercise-container"></div>
-
     <div id="add-set-container"></div>
 
     <button type="button" id="add-exercise">add exercise</button>
     <button type="button" id="add-set">add set</button>
-    <button type="submit">record your workout!</button>
+    <div id="submit-log">
+        <button type="submit">record your workout!</button>
+    </div>
 </form>
 
 <script>
-    // Flag to keep track of which button was last clicked
     let lastClicked = '';
-
     window.onload = function() {
-        console.log("script loaded");
         const formId = "entry-date";
         dateForm(formId);
         const elements = defineDateElements(formId);
         populateYearDropdown(elements);
         updateDays(elements);
         setToday(elements);
-
-        // add event listeners to trigger the updateDays function when month or year changes
         elements.monthElement.addEventListener("change", function() {
             updateDays(elements);
         });
-
-        // update the days when the month changes
         elements.yearElement.addEventListener("change", function() {
-            updateDays(elements);  // update the days when the year changes
+            updateDays(elements);
         });
         getRoutines();
     };
 
-    let set_num = 1;  // Define set_num outside so it persists
-    let lastExerciseDiv = null;  // To keep track of the last exercise added, so sets can be added only to it
+    let set_num = 1;
+    let lastExerciseDiv = null;
 
-    // Add event listener for the "Add Exercise" button
     document.getElementById("add-exercise").addEventListener("click", function() {
-
         const exerciseContainer = document.getElementById("add-exercise-container");
-
-        // Create a new div for the exercise entry
         const newExerciseDiv = document.createElement("div");
         newExerciseDiv.classList.add("exercise-entry");
-
-        // Set this as the last clicked exercise div
         lastExerciseDiv = newExerciseDiv;
-
-        // Call inputExercise to populate the datalist and input
         inputExercise(newExerciseDiv).then(() => {
-            // After the datalist is populated, add the first set under the new exercise
-            addSetInfo(set_num, newExerciseDiv);  // Call addSetInfo with initial set number (1)
-
-            // Append the new exercise div to the container
+            addSetInfo(set_num, newExerciseDiv);
             exerciseContainer.appendChild(newExerciseDiv);
         }).catch(error => {
             console.error('Error fetching exercise data:', error);
         });
     });
 
-// Add event listener for the "Add Set" button (outside of the exercise add listener)
-document.getElementById("add-set").addEventListener("click", function() {
-    if (lastExerciseDiv) {
-        // Increment the set number each time the "Add Set" button is clicked
-        set_num++;  // Increment set_num
+    document.getElementById("add-set").addEventListener("click", function() {
+        if (lastExerciseDiv) {
+            set_num++;
+            addSetInfo(set_num, lastExerciseDiv);
+        }
+    });
 
-        // Add the new set under the last exercise clicked
-        addSetInfo(set_num, lastExerciseDiv);  // Call addSetInfo with the incremented set number
-    }
-});
-
-
-    // Event listener for when a routine is selected from the dropdown
     document.getElementById("routine-select").addEventListener("change", async function() {
-        const routineName = this.value;
-        if (routineName) {
+        const selectedRoutine = this.value;
+        if (selectedRoutine) {
             try {
-                // Wait for the routine data to be fetched
-                const routineData = await getRoutineData(routineName);
-
-                // Ensure routineData is an array before proceeding
-                console.log("Routine Data:", routineData);
-                console.log("Is routineData an array?", Array.isArray(routineData));
-
+                const routineData = await getRoutineData(selectedRoutine);
+                console.log("routine data fetched")
                 if (Array.isArray(routineData)) {
-                    // Get the container where the form will be placed
                     const routineContainerElement = document.getElementById("routine-container");
-                    // Clear any existing content inside the container
                     routineContainerElement.innerHTML = '';
-                    // Generate form that contains the names of exercises in the routine for how many sets it has
                     followRoutineForm(routineData);
                 } else {
                     console.error("Routine data is not an array.");
@@ -119,6 +86,7 @@ document.getElementById("add-set").addEventListener("click", function() {
     });
 </script>
 {% endblock %}
+
 
 
 

@@ -7,20 +7,7 @@
 {% block main %}
 <form action="/stats" method="get">
     <div id="volume-container">
-        <label for="start-volume-date">start date</label>
-        <div id="start-volume-date"></div>
-        <label for="end-volume-date">end date</label>
-        <div id="end-volume-date"></div>
         <img src="data:image/png;base64,{{ volume_img }}" alt="Volume Table Image">
     </div>
 </form>
-<script>
-    window.onLoad = function (){
-        console.log("script loaded");
-        const formIdStart = "start-volume-date";
-        dateForm(formIdStart);
-        const startElements = defineDateElements(formId1);
-        
-    }
-</script>
 {% endblock %}

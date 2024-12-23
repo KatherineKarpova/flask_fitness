@@ -8,27 +8,11 @@
 <form action="/stats" method="get">
     <div id="strength-container">
         <label>Strength Progress</label>
-        <lable for="start-date">start date</lable>
-        <div id="start-date"></div>
-        <label for="end-date"></label>
-        <div id="end-date">end date</div>
         {% for exercise, graph in graphs.items() %}
-            <h3>{{ exercise }}</h3>
+            <h1>{{ exercise }}</h1>
             <img src="data:image/png;base64,{{ graph | e }}" alt="{{ exercise }}">
         {% endfor %}
     </div>
 </form>
-<script>
-    window.onLoad = function (){
-        // load date form html
-        // set to be first date of any log
-        const startId = getElementById("start-date");
-        dateForm(startId)
-        const startElements = defineDateElements(startId);
-        
-
-
-    }
-</script>
 {% endblock %}
 

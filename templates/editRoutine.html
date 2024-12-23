@@ -9,13 +9,13 @@
 <form id="edit-routine-form" action="/editRoutine" method="post">
     <!-- Routine select container -->
     <div id="routine-select-container">
-        <label for="routine-select">Select a Routine</label>
         <select id="routine-select" name="selected-routine-name" placeholder="routine-name" class="routine-select"></select>
             <!-- Routine options will be populated by JavaScript -->
         </select>
     </div>
     
-    <!-- Routine name input (for editing) -->
+    <!-- Routine name input (for editing) -->        
+
     <input type="text" id="edit-routine-name" name="edit-routine-name" placeholder="Enter routine name" class="long-input">
     <div id="edit-routine-container"></div>
     <div id="add-exercise-container"></div>
@@ -40,6 +40,8 @@
     document.addEventListener("DOMContentLoaded", function() {
         addExerciseSetsEvent();
         deleteRoutineEvent(); // Call the delete button handler here
+
+        // handle when a routine is selected
         document.getElementById("routine-select").addEventListener("change", function() {
         console.log("Routine selected");
 
@@ -49,18 +51,19 @@
         const routineContainer = document.getElementById("edit-routine-container");
         routineContainer.innerHTML = '';  // Clears all child elements (inputs, etc.)
 
-        // Clear the routine name input field
-        document.getElementById("edit-routine-name").value = '';  // Reset to empty
-
         if (selectedRoutine) {
-            // Pre-fill the routine name input field with the selected routine name
-            document.getElementById("edit-routine-name").value = selectedRoutine;
+
+            const editNameInput = document.getElementById("edit-routine-name");
+            // show input field for routine name that can be edited
+            editNameInput.hidden = false;
+            // fill the value with name input field the selected routine name
+            editNameInput.value = selectedRoutine;
 
             // Fetch the routine data when a routine is selected
             getRoutineData(selectedRoutine)
                 .then(routineData => {
                 // Once data is fetched, generate the form for editing exercises
-                    editRoutineForm("edit-routine-container", routineData);
+                    editRoutineForm(routineData);
                 })
                 .catch(error => {
                     console.error("Error loading routine data:", error);

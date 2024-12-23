@@ -6,8 +6,6 @@ from flask_session import Session
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-import hashlib
-from email_validator import validate_email, EmailNotValidError
 from models import db
 import pandas
 import base64
@@ -17,8 +15,6 @@ import matplotlib.pyplot as plot
 import io
 from datetime import date
 from flask_mail import Message, Mail
-import hashlib
-print(hasattr(hashlib, "scrypt"))
 
 # initialize flask app
 app = Flask(__name__)
@@ -119,7 +115,7 @@ def strength():
         plot.plot(strength_data["date"], strength_data["highest_weight"], color="skyblue")
         plot.xlabel("Date")
         plot.ylabel("Weight")
-        plot.title(f"Strength Stats for {exercise}")
+        plot.title(f"Strength stats for {exercise}")
 
         # save the plot to a BytesIO object to send it as an image
         img = io.BytesIO()
@@ -310,7 +306,7 @@ def edit_routine():
         if action == "update":
 
             new_routine_name = request.form.get("edit-routine-name")
-                # update the routine name if it has changed
+            # update the routine name if it has changed
             if selected_routine != new_routine_name:
                 routine_obj.name = new_routine_name
                 print(f"Updated routine name to: {new_routine_name}")
@@ -391,7 +387,7 @@ def reset_password():
         new_password = request.form.get("new-password", "").strip()
         new_password_confirmation = request.form.get("new-password-confirmation", "").strip()
         
-        if confirm_passwords_match(new_password, new_password_confirmation):
+        if new_password == new_password_confirmation:
             new_password_hash = generate_password_hash(new_password)
             email = token_record[1]  # Assuming the email is stored with the token
 
@@ -490,7 +486,11 @@ def register():
             flash("Passwords do not match.", "danger")
             return render_template("register.html")
 
-        password_hash = generate_password_hash(password)
+        # I was having an error because of not having the hashlib scrypt attribute accessible for generate_password_hash
+        # I learned I can fix this by adding pbkdf2:sha256 as a param
+        # that is would I did as it seemed easier than rebuilding Python with OpenSSL
+
+        password_hash = generate_password_hash(password, "pbkdf2:sha256")
         email_hash = hash_email(email)
 
         conn, c = sqlite3_conn()
@@ -503,7 +503,7 @@ def register():
         conn.close()
 
         flash("registration successful!")
-        return render_template("/login")
+        return render_template("/login.html")
 
     return render_template("register.html")
 

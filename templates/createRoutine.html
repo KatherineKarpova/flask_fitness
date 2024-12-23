@@ -7,8 +7,10 @@
 {% block main %}
 <form action="/createRoutine" method="post">
     <div id="create-routine-container">
-        <label for="routine-name">routine name</label>
-        <input type="text" name="routine-name", placeholder="routine name" class="long-input"><input>
+        <div>
+            <label for="routine-name">routine name</label>
+        </div>
+        <input type="text" name="routine-name" placeholder="routine name" class="long-input">
         <!-- dynamic fields for exercises and sets -->
         <div id="add-exercise-container">
         <!-- initial exercise and set fields will be displayed here -->
