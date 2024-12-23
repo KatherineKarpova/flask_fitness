@@ -15,23 +15,26 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plot
 import io
+from datetime import date
+from flask_mail import Message, Mail
+import hashlib
+print(hasattr(hashlib, "scrypt"))
 
 # initialize flask app
 app = Flask(__name__)
-    
-# set configurations from config.py for security
-app.config.from_object(Config)
-    
-# initialize SQLAlchemy with the app
-# db object has already been initialized in models.py
-db.init_app(app)
 
 # set configurations from config.py for security
 app.config.from_object(Config)
+
+# initialize SQLAlchemy with the app
+db.init_app(app)
+
+# Initialize Flask-Mail with the app configuration
+mail = Mail(app)
 
 # initialize flask session
 Session(app)
- 
+
 @app.route("/volume", methods=["GET", "POST"])
 @login_required
 def volume():
@@ -42,19 +45,42 @@ def volume():
     saturday = format_date(saturday)
     conn, c = sqlite3_conn()
     # count num of rows grouped by the muscle worked as prime mover
-    volume_data = c.execute("""SELECT COUNT(*) AS "sets", muscles.name AS "muscle"
-                            FROM muscles
-                            JOIN muscles_worked ON muscles.id = muscles_worked.muscle_id
+    volume_query = """SELECT COUNT(muscles.id) AS "sets", muscles.name AS "muscle"
+                        FROM muscles
+                        JOIN muscles_worked ON muscles.id = muscles_worked.muscle_id
+                        WHERE muscles_worked.exercise_id IN(
+                            SELECT logs.exercise_id
+                            FROM logs
                             WHERE muscles_worked.role = "prime mover"
-                            AND muscles_worked.exercise_id IN(
-                                SELECT logs.exercise_id 
-                                FROM logs
-                                WHERE date BETWEEN ? AND ?
-                                AND logs.user_id = ?
-                            )
-                            GROUP BY muscles.id""", (sunday, saturday, session["user_id"],)).fetchall()
-    print(volume_data)
-    return render_template("/volume.html", volume_data=volume_data)
+                            AND date BETWEEN ? AND ?                                
+                            AND logs.user_id = ?
+                        )
+                        GROUP BY muscles.id"""
+    
+    # create dataframe by having pandas read the above query directly
+    # I find out that this method saves memory compared to getting results via fetchall()
+    volume_data = c.execute(volume_query, (sunday, saturday, session["user_id"])).fetchall()
+
+    volume_data = pandas.read_sql_query(volume_query, conn, params=(sunday, saturday, session["user_id"]))
+    if volume_data.empty:
+        volume_img = flash("no data found")
+        return render_template("/volume.html", volume_img=volume_img)
+    # Create a matplotlib figure to render the table
+    fig, ax = plot.subplots(figsize=(6, 2))  # Adjust size as necessary
+    ax.axis('off')  # Turn off the axes
+
+    # Render the DataFrame as a table
+    table = ax.table(cellText=volume_data.values, colLabels=volume_data.columns, loc='center', cellLoc='center')
+
+    # Save the table as an image in a BytesIO object
+    img_buf = io.BytesIO()
+    plot.savefig(img_buf, format='png', bbox_inches='tight', pad_inches=0.05)
+    img_buf.seek(0)  # Rewind the buffer to the beginning
+
+    # Optionally, encode the image to base64 to embed in HTML directly
+    volume_img = base64.b64encode(img_buf.getvalue()).decode('utf-8')
+
+    return render_template("/volume.html", volume_img=volume_img)
     
     
 @app.route("/strength", methods=["GET"])
@@ -63,7 +89,7 @@ def strength():
     conn, c = sqlite3_conn()  # establish a connection to the database
     graphs = {}  # dictionary where key = exercise name and value = line graph
 
-    # sql query to get the strength data (weights and dates)
+    # sql query to get the sexercises actually logged
     exercises = c.execute("""SELECT DISTINCT exercises.name AS exercise
                               FROM exercises
                               JOIN logs ON exercises.id = logs.exercise_id
@@ -74,22 +100,23 @@ def strength():
     for row in exercises:
         exercise = row["exercise"]
         # convert the data into a pandas dataframe for easier plotting
-        strength_data = c.execute("""SELECT MAX(logs.weight) AS highest_weight, logs.date
-                                  FROM logs
-                                  JOIN exercises ON logs.exercise_id = exercises.id
-                                  WHERE exercises.name = ? AND logs.user_id = ?
-                                  GROUP BY logs.date
-                                  ORDER BY logs.date DESC
-                                  """, (exercise, session["user_id"])).fetchall()
+        strength_query = """
+            SELECT MAX(logs.weight) AS highest_weight, logs.date
+            FROM logs
+            JOIN exercises ON logs.exercise_id = exercises.id
+            WHERE exercises.name = ? AND logs.user_id = ?
+            GROUP BY logs.date
+            ORDER BY logs.date DESC
+            """
         
-        dataframe = pandas.DataFrame(strength_data, columns=["weight", "date"])
+        strength_data = pandas.read_sql_query(strength_query, conn, params=(exercise, session["user_id"]))
 
         # create a plot using matplotlib
         plot.figure(figsize=(10, 6))
-        dataframe["date"] = pandas.to_datetime(dataframe["date"])  # convert date column to datetime
+        strength_data["date"] = pandas.to_datetime(strength_data["date"])  # convert date column to datetime
 
         # plot the graph
-        plot.plot(dataframe["date"], dataframe["weight"], color="skyblue")
+        plot.plot(strength_data["date"], strength_data["highest_weight"], color="skyblue")
         plot.xlabel("Date")
         plot.ylabel("Weight")
         plot.title(f"Strength Stats for {exercise}")
@@ -104,40 +131,6 @@ def strength():
 
     conn.close()  # close the database connection
     return render_template("strength.html", graphs=graphs)  # render the template and pass the graphs dictionary
-
-
-
-@app.route("/full_routine", methods=["GET", "POST"])
-@login_required
-def full_routine():
-    # get selected routine
-    routine_name = request.form.get("routine_name")
-
-    if routine_name:
-        conn, c = sqlite3_conn()
-        # join the three tables and fetch name of exercises and num sets
-        routine = c.execute("""
-            SELECT exercises.name AS exercise_name, routine_exercises.sets AS sets
-            FROM exercises
-            JOIN routine_exercises ON exercises.id = routine_exercises.exercise_id
-            JOIN routines ON routine_exercises.routine_id = routines.id
-            WHERE routines.name = ? AND routines.user_id = ?
-            """, (routine_name, session["user_id"])).fetchall()
-        conn.close()
-
-        # Check if any results are returned
-        if routine:
-            # Return the results as a list of dictionaries
-            routine_data = [{
-                'exercise_name': row['exercise_name'],
-                'sets': row['sets'],
-            }for row in routine]
-            print(routine_data)
-            return jsonify(routine_data)  # Return data as JSON
-        else:
-            return jsonify({"error": "routine not found"}), 404
-
-    return jsonify({"error": "no routine selected"}), 400
 
 # get exercise names with json to use with js
 @app.route("/json_exercises", methods=["GET"])
@@ -174,7 +167,8 @@ def index():
         print(request.form)
         # get date values from the form
         date = get_form_date("entry-date")
-        date = format_date(date)
+        # I had this function, date = format_date(date), because I thought I needed to convert the date obj to a string
+        # but I found out sqlite3 will only allow inserting the obj and not a string so I removed it 
 
         # get exercise id to insert based on name from exercise selected from input field
         exercises_list = request.form.getlist("exercises[]")
@@ -186,28 +180,30 @@ def index():
         print(f"Reps: {reps_list}")
 
         # loop over each exercise and corresponding set value
-        for exercise, weight, reps in zip(exercises_list, weights_list, reps_list):
+        for exercise_name, weight, reps in zip(exercises_list, weights_list, reps_list):
+            # check if they inputted a valid exercise
+            exercise_obj = Exercise.query.filter_by(name=exercise_name).first() 
+            if exercise_obj is None:
+                flash("Did you forget to put in an exercise?")
+                continue
             try:
-                exercise_id = get_exercise_id(exercise)  # get exercise id based on exercise name
-                if exercise_id is None:
-                    flash(f"Exercise '{exercise}' not found", "danger")
-                    continue  # skip this entry if exercise id is not found
-
-                # create a new log entry
+            # create a new log entry if exercise name is valid and obj is created
                 new_log = Log(
-                    user_id=session["user_id"],  # assuming you're using flask-login for user session
-                    date=date,
-                    exercise_id=exercise_id,
-                    weight=try_int(weight, 0),
-                    reps=try_int(reps, 0)
+                user_id=session["user_id"],
+                date=date,
+                exercise_id=exercise_obj.id,
+                weight=try_int(weight),
+                reps=try_int(reps)                
                 )
 
                 # add the new log entry to the session
                 db.session.add(new_log)
+                print(f"Inserting log entry: user_id={session['user_id']}, date={date}, exercise_id={exercise_obj.id}, weight={weight}, reps={reps}")
+
 
             except Exception as e:
                 # handle the exception, flash an error message
-                flash(f"Error logging set for {exercise}: {str(e)}", "danger")
+                flash(f"Error logging set for {exercise_name}: {str(e)}", "danger")
                 db.session.rollback()  # rollback any changes made if there's an error
                 continue  # continue to the next iteration if an error occurs
 
@@ -218,74 +214,201 @@ def index():
             db.session.rollback()  # rollback changes if commit fails
             flash(f"Error committing the data: {str(e)}", "danger")
 
-        conn.close()  # close the database connection if using sqlite3
-
         # re-render the form with the previous values filled in
         return render_template("index.html", exercises=exercises)
 
     return render_template("index.html", exercises=exercises)
 
+@app.route("/full_routine", methods=["GET", "POST"])
+@login_required
+def full_routine():
+    # get selected routine
+    routine_name = request.form.get("routine_name")
+
+    if routine_name:
+        conn, c = sqlite3_conn()
+        # join the three tables and fetch name of exercises and num sets
+        routine = c.execute("""
+            SELECT exercises.name AS exercise_name, routine_exercises.sets AS sets, part
+            FROM exercises
+            JOIN routine_exercises ON exercises.id = routine_exercises.exercise_id
+            JOIN routines ON routine_exercises.routine_id = routines.id
+            WHERE routines.name = ? AND routines.user_id = ?
+            """, (routine_name, session["user_id"])).fetchall()
+        conn.close()
+
+        # Check if any results are returned
+        if routine:
+            # Return the results as a list of dictionaries
+            routine_data = [{
+                'exercise_name': row['exercise_name'],
+                'sets': row['sets'],
+                'part': row['part']
+            }for row in routine]
+            print(routine_data)
+            return jsonify(routine_data)  # Return data as JSON
+        else:
+            return jsonify({"error": "routine not found"}), 404
+
+    return jsonify({"error": "no routine selected"}), 400
+
 
 @app.route("/createRoutine", methods=["GET", "POST"])
 @login_required
 def create_routine():
-    conn, c = sqlite3_conn()  # assuming this function opens a connection to your sqlite db
-    exercises = exercise_names()  # get the list of exercise names
 
     if request.method == "POST":
         # get routine name from the form
-        routine_name = request.form.get("new-routine-name")
+        routine_name = request.form.get("routine-name")
+
+        # check if routine name already in db
+        routine_check = Routine.query.filter_by(name=routine_name, user_id=session["user_id"]).first()
+
+        if routine_check:
+            flash("You have already used that name for a routine.", "info")
+            return render_template("/editRoutine.html")
 
         # insert the routine name into the 'routines' table
-        c.execute("""INSERT INTO routines (name, user_id) VALUES (?, ?)""", 
-                  (routine_name, session["user_id"]))
-        conn.commit()
-
-        # get the routine id of the inserted routine
-        c.execute("""SELECT id FROM routines WHERE name = ? AND user_id = ?""", 
-                  (routine_name, session["user_id"]))
-        routine_id = c.fetchone()[0]
+        new_routine = Routine(
+            user_id=session["user_id"],
+            name=routine_name
+        )
+        db.session.add(new_routine)
 
         # get exercises and sets from the form (assuming they are passed as arrays)
-        exercises = request.form.getlist("exercises[]")
-        print(exercises)
-        sets = request.form.getlist("sets[]")
-        print(sets)
+        exercises_list = request.form.getlist("exercises[]")
+        print(exercises_list)
+        sets_list = request.form.getlist("sets[]")
+        print(sets_list)
 
-        # loop over each exercise and corresponding set value
-        for exercise, set_num in zip(exercises, sets):
-            # get exercise id from the exercise name (assuming `get_exercise_id` works correctly)
-            exercise_id = get_exercise_id(exercise)
-            print(f"exercise id for {exercise}: {exercise_id}")
-            # skip list items that are empty to avoid issue if you press add exercise and then decide not to
-            if exercise == None:
-                flash("did you forget to put in an exercise?")
-            if set_num == None:
-                flash("did you forget to put in any sets?")
-            else:
-                try:
-                    # insert into routine_exercises table
-                    c.execute("""INSERT INTO routine_exercises (user_id, routine_id, exercise_id, sets) 
-                        VALUES (?, ?, ?, ?)""", 
-                        (session["user_id"], routine_id, exercise_id, int(set_num)))
-                except Exception as e:
-                    print(f"error inserting exercise data: {str(e)}")
+        create_routine_exercises(new_routine, exercises_list, sets_list)
         
-        conn.commit()
-        conn.close()
+        db.session.commit()
         
         flash("new routine created!", "success")
         return redirect("/")  # redirect to the main page or wherever necessary
-
-    # if GET request, just render the routine form
-    return render_template("createRoutine.html", exercises=exercises)
+    return render_template("createRoutine.html")
 
 @app.route("/editRoutine", methods=["GET", "POST"])
 @login_required
 def edit_routine():
-    #if request.method == "POST":
+    if request.method == "POST":
+
+        # get selected routine
+        selected_routine = request.form.get("selected-routine-name")
+
+        # turn it into an obj
+        routine_obj = Routine.query.filter_by(name=selected_routine, user_id=session["user_id"]).first()
+
+        # check if they selected a valid routine
+        if not routine_obj:
+            flash("Routine not found.", "error")
+            return redirect("/")
+
+        # check if the user wants to update or delete a routine
+        action = request.form.get("action")
+        if action == "update":
+
+            new_routine_name = request.form.get("edit-routine-name")
+                # update the routine name if it has changed
+            if selected_routine != new_routine_name:
+                routine_obj.name = new_routine_name
+                print(f"Updated routine name to: {new_routine_name}")
+                # get the updated list of exercises and sets
+            exercises = request.form.getlist("exercises[]")
+            sets = request.form.getlist("sets[]")
+            # remove any exercises no longer part of the routine
+            remove_routine_exercises(routine_obj, exercises)
+
+            # update exercises and sets
+            update_routine_exercises(routine_obj, exercises, sets)
+
+            # commit changes to the database
+            db.session.commit()
+            flash("Routine successfully updated!", "success")
+            return redirect("/")
+        elif action == "delete":
+            db.session.delete(routine_obj)
+            db.session.commit()
+            flash("selected routine deleted", "success")
+            return redirect("/")
 
     return render_template("/editRoutine.html")
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    email = request.form.get('email')
+    email = normalize_valid_email(email)
+    if email is None:
+        flash(f"Please provide a valid email. {login_link()}")
+        return redirect("/login")
+    email_hash = hash_email(email)
+    email_result = User.query.filter_by(email_hash=email_hash).first()
+    if email_result:
+        # Generate the reset message and send the email
+        msg = Message(
+            'Password Reset Request',
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[email]
+        )
+        msg.body = reset_password_message()
+
+        try:
+            mail.send(msg)
+            flash('Email sent successfully', 'success')
+        except Exception as e:
+            flash(f'Error sending email: {str(e)}', 'error')
+
+        return redirect('/')
+
+    flash("Please enter a valid email.", "error")
+    return redirect("/login.html")
+
+
+# below are all the route associated with authorizing accounts
+
+
+@app.route('/resetPassword', methods=["GET", "POST"])
+def reset_password():
+    token = request.args.get('token')  # Retrieve the token from the URL
+
+    # Verify the token and perform any necessary checks (like expiration)
+    if not token:
+        flash("The reset link is invalid.", "error")
+        return redirect("/login")
+
+    # Assuming you are saving the token somewhere (e.g., in the database)
+    conn, c = sqlite3_conn()  # Connect to your database
+    c.execute("SELECT * FROM password_reset_tokens WHERE token = ?", (token,))
+    token_record = c.fetchone()
+
+    if not token_record:
+        flash("The reset link is invalid or expired.", "error")
+        return redirect("/login")
+
+    # If the token is valid, allow the user to reset their password
+    if request.method == "POST":
+        new_password = request.form.get("new-password", "").strip()
+        new_password_confirmation = request.form.get("new-password-confirmation", "").strip()
+        
+        if confirm_passwords_match(new_password, new_password_confirmation):
+            new_password_hash = generate_password_hash(new_password)
+            email = token_record[1]  # Assuming the email is stored with the token
+
+            # Update the password in the database
+            c.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_password_hash, email))
+            conn.commit()
+
+            # Optionally delete the token from the database after successful reset
+            c.execute("DELETE FROM password_reset_tokens WHERE token = ?", (token,))
+            conn.commit()
+
+            flash("Your password has been reset successfully.", "success")
+            return redirect("/login")
+        else:
+            flash("Passwords do not match.", "error")
+
+    return render_template("reset_password.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -293,8 +416,8 @@ def login():
     if not clear_user_session():
         render_template("/register.html")
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+        email = request.form.get("email", "").strip()
+        password = request.form.get("password", "").strip()
         
         # validate that email and password are provided
         if not email:
@@ -330,33 +453,47 @@ def login():
 
     return render_template("login.html")
 
-
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        email = request.form.get("email")
-        email_confirmation = request.form.get("email-confirmation")
-        password = request.form.get("password")
-        password_confirmation = request.form.get("password-confirmation")
+
+        # retrive inputs from the form and make sure to strip any white space to avoid user errors
+        # capitalization matters
+
+        email = request.form.get("email", "").strip()
+        email_confirmation = request.form.get("email-confirmation", "").strip()
+        password = request.form.get("password", "").strip()
+        password_confirmation = request.form.get("password-confirmation", "").strip()
+
 
         if not email or not email_confirmation or not password or not password_confirmation:
             flash("all fields are required!")
-            return redirect("/register")
+            return render_template("register.html")
         
-        email, email_confirmation = confirm_normalize_emails(email, email_confirmation)
+        # checking if the email strings match in case they would be valid without a typo 
+        elif email != email_confirmation:
+            flash("Emails do not match")
+            return render_template("register.html")
+        
+        # validate and normalize the emails to move forward
+        # normalize_valid_email will return None so I can flash a user friendly message and redirect them
 
-        if email or email_confirmation is None:
-            return redirect("/register")
+        email = normalize_valid_email(email)
+        email_confirmation = normalize_valid_email(email_confirmation)
 
-        elif password != password_confirmation:
-            flash("passwords do not match")
-            return redirect("/register")
+        if email is None or email_confirmation is None:
+            flash("A valid email address is required.", "danger")
+            return render_template("register.html")
+
+        # confirm passwords match before hashing
+        if password != password_confirmation:
+            flash("Passwords do not match.", "danger")
+            return render_template("register.html")
 
         password_hash = generate_password_hash(password)
         email_hash = hash_email(email)
 
-        conn = sqlite3.connect("fitness.db")
-        c = conn.cursor()
+        conn, c = sqlite3_conn()
         try:
             c.execute("INSERT INTO users (email_hash, email, password_hash) VALUES (?, ?, ?)", (email_hash, email, password_hash))
         except sqlite3.IntegrityError:
@@ -366,9 +503,10 @@ def register():
         conn.close()
 
         flash("registration successful!")
-        return redirect("/login")
+        return render_template("/login")
 
     return render_template("register.html")
+
 
 @app.route("/logout", methods=["GET", "POST"])
 @login_required

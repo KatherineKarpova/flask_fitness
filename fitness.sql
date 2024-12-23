@@ -1,3 +1,17 @@
+
+/* get weekly volume*/
+SELECT COUNT(muscles.id) AS "sets", muscles.name AS "muscle"
+FROM muscles
+JOIN muscles_worked ON muscles.id = muscles_worked.muscle_id
+WHERE muscles_worked.exercise_id IN(
+SELECT logs.exercise_id
+FROM logs
+WHERE date BETWEEN "2024-12-05" AND "2024-12-16"
+AND role = "prime mover"
+)
+GROUP BY muscles.id
+;
+
 /* create tables to store user info, exercises, and workouts */
 
 CREATE TABLE users(
@@ -19,8 +33,8 @@ CREATE TABLE muscles(
 );
 -- goal is to store the muscles engaged for each exercise
 CREATE TABLE muscles_worked(
-    muscle_id INTEGER,
-    exercise_id INTEGER,
+    muscle_id INTEGER NOT NULL,
+    exercise_id INTEGER NOT NULL,
     role TEXT,
     FOREIGN KEY(muscle_id) REFERENCES muscles(id),
     FOREIGN KEY(exercise_id) REFERENCES exercises(id)
@@ -54,6 +68,7 @@ CREATE TABLE routine_exercises(
     routine_id INTEGER NOT NULL,
     exercise_id INTEGER NOT NULL,
     sets INTEGER NOT NULL,
+    part INTEGER,
     FOREIGN KEY (user_id) REFERENCES user(id),
     FOREIGN KEY (routine_id) REFERENCES routines(id),
     FOREIGN KEY (exercise_id) REFERENCES exercises(id)

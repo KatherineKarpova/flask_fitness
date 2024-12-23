@@ -9,3 +9,4 @@ flask-cors==5.0.0
 pandas==2.2.3
 matplotlib==3.9.3
 installed Agg==0.3.1
+flask_mail==0.10.0

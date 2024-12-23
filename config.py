@@ -1,14 +1,23 @@
 import secrets
 
 class Config:
-    # session configuration
+    # Session configuration
     SECRET_KEY = secrets.token_hex(32)
     SESSION_TYPE = 'filesystem'
-    # Set the session to be permanent (keeps the user logged in unless they log out)
     SESSION_PERMANENT = False
-    # Configure the session cookie
-    SESSION_COOKIE_NAME = 'session'  # You can specify a custom name for the session cookie
-    SESSION_COOKIE_HTTPONLY = True  # Prevents JavaScript from accessing the session cookie
-    SESSION_COOKIE_SAMESITE = 'Lax'  # Controls the cross-site request behavior
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////Users/kayakarpova/cs50/fitness.db'  # Example URI for SQLite
+    SESSION_COOKIE_NAME = 'session'
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    
+    # Database configuration (example for SQLite)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////Users/kayakarpova/cs50/fitness.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Flask-Mail configuration
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587  # or 465 for SSL
+    MAIL_USE_TLS = True
+    # Use an environment variable for send email info
+    MAIL_USERNAME = "ohkaya922@gmail.com"
+    MAIL_PASSWORD = "pekhus-xUghaw-tyrje1"
+

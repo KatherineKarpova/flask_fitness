@@ -28,14 +28,14 @@ def main():
                 else:
                     exercise_id = c.execute(
                         '''SELECT id FROM exercises WHERE name = ?''', (row['exercise'],)).fetchone()[0]
+                insert_muscles(exercise_id, row["prime movers"], "prime mover")
+                # get muscles id
                 # Insert prime movers
-                insert_muscles(exercise_id, row['prime movers'], 'prime mover')
                 # Insert synergists
-                insert_muscles(exercise_id, row['synergists'], 'synergist')
-
+                insert_muscles(exercise_id, row["synergists"], "synergist")
         conn.commit()
         # Visual confirmation code ran smoothly
-        print("Woohoo! Data inserted successfully!")
+        print("Woohoo! Data processed successfully!")
     except Exception as e:
         print(f"Error processing file: {e}")
     finally:
@@ -50,14 +50,27 @@ def insert_muscles(exercise_id, column, role):
     # Loop through the muscles to insert them into the database
     for muscle in muscles:
         # Check if the muscle already exists in the 'muscles' table
-        if not in_database('muscles', 'name', muscle):
+        if not in_database("muscles", "name", muscle):
+            # insert muscles name and an id will be given
             c.execute('''INSERT INTO muscles (name) VALUES (?)''', (muscle,))
+            conn.commit()
+        # get muscle id
+            muscle_id = c.lastrowid
+            print(f"{muscle} inserted into muscles")
+        else:
+            muscle_id_result = c.execute("""SELECT muscles.id FROM muscles WHERE name = ?""", (muscle,)).fetchone()
+            if not muscle_id_result:
+                print(f"Warning: Muscle '{muscle}' not found in database, skipping insertion into muscles_worked.")
+            
+            else:
+                muscle_id = muscle_id_result[0]
+
+        if muscle_id:
+            c.execute('''INSERT INTO muscles_worked (muscle_id, exercise_id, role)
+                        VALUES (?, ?, ?)''',
+                        (muscle_id, exercise_id, role))
 
         # Insert the relationship between muscle and exercise into muscles_worked
-        c.execute('''INSERT INTO muscles_worked (muscle_id, exercise_id, role)
-                     VALUES ((SELECT id FROM muscles WHERE name = ?), ?, ?)''',
-                  (muscle, exercise_id, role))
-
 
 def in_database(table, column, value):
     # Check if exercise is already in the database

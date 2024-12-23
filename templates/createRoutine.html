@@ -15,7 +15,7 @@
         </div>
         <button type="button" id="add-exercise">add exercise</button>
     </div>
-    <button type="submit">save</button>
+    <button type="submit" name="action" value="save">save routine</button>
 </form>
 
 <script>
@@ -29,9 +29,9 @@
             newExerciseDiv.classList.add("exercise-entry");
 
             // add exercise inputs (e.g., exercise name, sets)
-            addExercise(newExerciseDiv).then(() => {
+            inputExercise(newExerciseDiv).then(() => {
             // after populating the exercise datalist, add input for sets
-            addInputList("sets", "sets", newExerciseDiv, "short-input");
+            addInput("sets[]", "sets", newExerciseDiv, "short-input");
             // append the new exercise div to the container
             exerciseContainer.appendChild(newExerciseDiv);
             }).catch(error => {

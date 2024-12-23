@@ -11,32 +11,25 @@
     <div id="routine-select-container">
         <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
     </div>
-    <div id="routine-table-container"></div>
-        <div id="exercise-container">
-            <div class="exercise-entry">
-                <label for="exercises[]">Exercise</label>
-                <input list="exercise-list" name="exercises[]" id="exercise-input" class="long-input" placeholder="exercise">
-                <datalist id="exercise-list">
-                    {% for exercise in exercises %}
-                        <option value="{{ exercise }}"></option>
-                    {% endfor %}
-                </datalist>
-                <label for="weight">weight</label>
-                <input name="weights[]" type="text" id="weight" placeholder="lbs" class="short-input">
-
-                <label for="reps">reps</label>
-                <input name="reps[]" type="text" id="reps" placeholder="reps" class="short-input">
-            </div>
-        </div>
+    <div id="routine-container"></div>
+    <div id="exercise-container">
+        <div class="exercise-entry"></div>
+    </div>
 
     <!-- dynamically added exercises -->
     <div id="add-exercise-container"></div>
 
+    <div id="add-set-container"></div>
+
     <button type="button" id="add-exercise">add exercise</button>
+    <button type="button" id="add-set">add set</button>
     <button type="submit">record your workout!</button>
 </form>
 
 <script>
+    // Flag to keep track of which button was last clicked
+    let lastClicked = '';
+
     window.onload = function() {
         console.log("script loaded");
         const formId = "entry-date";
@@ -58,34 +51,72 @@
         getRoutines();
     };
 
+    let set_num = 1;  // Define set_num outside so it persists
+    let lastExerciseDiv = null;  // To keep track of the last exercise added, so sets can be added only to it
+
+    // Add event listener for the "Add Exercise" button
     document.getElementById("add-exercise").addEventListener("click", function() {
-    const exerciseContainer = document.getElementById("add-exercise-container");
 
-    // create a new div for the exercise entry
-    const newExerciseDiv = document.createElement("div");
-    newExerciseDiv.classList.add("exercise-entry");
+        const exerciseContainer = document.getElementById("add-exercise-container");
 
-    // call addExercise to populate the datalist and input
-    addExercise(newExerciseDiv).then(() => {
-        // after the datalist is populated, add weight and reps input fields
-        addInputList("weight", "lbs", newExerciseDiv, "short-input");
-        addInputList("reps", "reps", newExerciseDiv, "short-input");
+        // Create a new div for the exercise entry
+        const newExerciseDiv = document.createElement("div");
+        newExerciseDiv.classList.add("exercise-entry");
 
-        // append the new exercise div to the container
-        exerciseContainer.appendChild(newExerciseDiv);
-    }).catch(error => {
-        console.error('error fetching exercise data:', error);
+        // Set this as the last clicked exercise div
+        lastExerciseDiv = newExerciseDiv;
+
+        // Call inputExercise to populate the datalist and input
+        inputExercise(newExerciseDiv).then(() => {
+            // After the datalist is populated, add the first set under the new exercise
+            addSetInfo(set_num, newExerciseDiv);  // Call addSetInfo with initial set number (1)
+
+            // Append the new exercise div to the container
+            exerciseContainer.appendChild(newExerciseDiv);
+        }).catch(error => {
+            console.error('Error fetching exercise data:', error);
+        });
     });
+
+// Add event listener for the "Add Set" button (outside of the exercise add listener)
+document.getElementById("add-set").addEventListener("click", function() {
+    if (lastExerciseDiv) {
+        // Increment the set number each time the "Add Set" button is clicked
+        set_num++;  // Increment set_num
+
+        // Add the new set under the last exercise clicked
+        addSetInfo(set_num, lastExerciseDiv);  // Call addSetInfo with the incremented set number
+    }
 });
 
-    // event listener for when a routine is selected from the dropdown
-    document.getElementById("routine-select").addEventListener("change", function() {
-        // this.value will get whatever value is selected 
+
+    // Event listener for when a routine is selected from the dropdown
+    document.getElementById("routine-select").addEventListener("change", async function() {
         const routineName = this.value;
         if (routineName) {
-            fullRoutine(routineName);  // fetch routine data when a routine is selected
+            try {
+                // Wait for the routine data to be fetched
+                const routineData = await getRoutineData(routineName);
+
+                // Ensure routineData is an array before proceeding
+                console.log("Routine Data:", routineData);
+                console.log("Is routineData an array?", Array.isArray(routineData));
+
+                if (Array.isArray(routineData)) {
+                    // Get the container where the form will be placed
+                    const routineContainerElement = document.getElementById("routine-container");
+                    // Clear any existing content inside the container
+                    routineContainerElement.innerHTML = '';
+                    // Generate form that contains the names of exercises in the routine for how many sets it has
+                    followRoutineForm(routineData);
+                } else {
+                    console.error("Routine data is not an array.");
+                }
+            } catch (error) {
+                console.error("Error fetching routine data:", error);
+            }
         }
-});
+    });
 </script>
 {% endblock %}
 
