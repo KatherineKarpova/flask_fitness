@@ -7,34 +7,33 @@ c = conn.cursor()
 
 
 def main():
-    # Check for 2nd commandline argument that is a csv file
-    # This is to make this code reusable if I want to add more exercises
+    # check for 2nd commandline argument that is a csv file
+    # this is to make this code reusable if I want to add more exercises
     check_cla_count(2)
     validate_csv(sys.argv[1])
     try:
         with open(sys.argv[1], newline='') as csvfile:
             reader = csv.DictReader(csvfile, quotechar='"')
 
-            # Read the data from the CSV
+            # read the data from the CSV
             for row in reader:
-                # Check if exercise is already in the database
+                # check if exercise is already in the database
                 if not in_database('exercises', 'name', row['exercise']):
-                    # Insert the exercise first to get the exercise_id
+                    # insert the exercise first to get the exercise_id
                     c.execute('''INSERT INTO exercises (name, type, movement_pattern)
                         VALUES (?, ?, ?)''',
                               (row['exercise'], row['type'], row['movement pattern']))
                     exercise_id = c.lastrowid
-                # Select query to get exercise_id if already in the database
+                # select query to get exercise_id if already in the database
                 else:
                     exercise_id = c.execute(
                         '''SELECT id FROM exercises WHERE name = ?''', (row['exercise'],)).fetchone()[0]
+                # insert prime movers
                 insert_muscles(exercise_id, row["prime movers"], "prime mover")
-                # get muscles id
-                # Insert prime movers
-                # Insert synergists
+                # insert synergists
                 insert_muscles(exercise_id, row["synergists"], "synergist")
         conn.commit()
-        # Visual confirmation code ran smoothly
+        # visual confirmation code ran smoothly
         print("Woohoo! Data processed successfully!")
     except Exception as e:
         print(f"Error processing file: {e}")
@@ -44,12 +43,12 @@ def main():
 
 def insert_muscles(exercise_id, column, role):
 
-    # Split the column (prime movers or synergists) by commas and clean up the muscles
+    # split the column (prime movers or synergists) by commas and clean up the muscles
     muscles = [muscle.strip().replace('"', '') for muscle in column.split(',')]
 
-    # Loop through the muscles to insert them into the database
+    # loop through the muscles to insert them into the database
     for muscle in muscles:
-        # Check if the muscle already exists in the 'muscles' table
+        # check if the muscle already exists in the 'muscles' table
         if not in_database("muscles", "name", muscle):
             # insert muscles name and an id will be given
             c.execute('''INSERT INTO muscles (name) VALUES (?)''', (muscle,))
@@ -70,10 +69,10 @@ def insert_muscles(exercise_id, column, role):
                         VALUES (?, ?, ?)''',
                         (muscle_id, exercise_id, role))
 
-        # Insert the relationship between muscle and exercise into muscles_worked
+        # insert the relationship between muscle and exercise into muscles_worked
 
 def in_database(table, column, value):
-    # Check if exercise is already in the database
+    # check if exercise is already in the database
     print(f"Checking if {value} is in {table}.{column}")
     inserted_values = c.execute(f'''SELECT {column} FROM {table}''').fetchall()
     if value not in [row[0] for row in inserted_values]:
@@ -86,9 +85,10 @@ def check_cla_count(n):
     import sys
 
     argc = len(sys.argv)
-    # If the user does not specify exactly one command-line argument
+    # if the user does not specify exactly one command-line argument
     if argc < n:
         sys.exit('Too few command-line arguments')
+    # if too many
     elif argc > n:
         sys.exit('Too many command-line arguments')
     else:

@@ -5,7 +5,6 @@ log in
 {% endblock %}
 
 {% block main %}
-<!-- login form -->
 <form action="/login" method="post">
     <div class="mb-3">
         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="email" placeholder="email" type="text" class="long-input" required>
@@ -18,7 +17,6 @@ log in
     <div id="forgot-password-container"></div>
 </form>
 
-<!-- forgot password modal/section -->
 <div id="forgot-password-form" style="display:none;">
     <form action="/forgot-password" method="post">
         <div class="mb-3">

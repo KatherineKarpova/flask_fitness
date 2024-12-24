@@ -2,7 +2,7 @@ from helpers import *
 import sqlite3
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_session import Session 
+from flask_session import Session
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -22,20 +22,23 @@ app = Flask(__name__)
 # set configurations from config.py for security
 app.config.from_object(Config)
 
-# initialize SQLAlchemy with the app
+# initialize sqlalchemy with the app
 db.init_app(app)
 
-# Initialize Flask-Mail with the app configuration
+# initialize flask-mail with the app configuration
 mail = Mail(app)
 
 # initialize flask session
 Session(app)
 
+# https://www.geeksforgeeks.org/different-ways-to-create-pandas-dataframe/
+# helped me create frameworks for the volume and strength routes' data
+
 @app.route("/volume", methods=["GET", "POST"])
 @login_required
 def volume():
     # count num sets involving each muscle based on date range
-    # use date range of Sunday - Monday
+    # use date range of sunday - monday
     sunday, saturday = past_week_dates(date.today())
     sunday = format_date(sunday)
     saturday = format_date(saturday)
@@ -54,27 +57,27 @@ def volume():
                         GROUP BY muscles.id"""
     
     # create dataframe by having pandas read the above query directly
-    # I find out that this method saves memory compared to getting results via fetchall()
+    # i find out that this method saves memory compared to getting results via fetchall()
     volume_data = c.execute(volume_query, (sunday, saturday, session["user_id"])).fetchall()
 
     volume_data = pandas.read_sql_query(volume_query, conn, params=(sunday, saturday, session["user_id"]))
     if volume_data.empty:
         volume_img = flash("no data found")
         return render_template("/volume.html", volume_img=volume_img)
-    # Create a matplotlib figure to render the table
-    fig, ax = plot.subplots(figsize=(6, 2))  # Adjust size as necessary
-    ax.axis('off')  # Turn off the axes
+    # create a matplotlib figure to render the table
+    fig, ax = plot.subplots(figsize=(6, 2))  # adjust size as necessary
+    ax.axis("off")  # turn off the axes
 
-    # Render the DataFrame as a table
-    table = ax.table(cellText=volume_data.values, colLabels=volume_data.columns, loc='center', cellLoc='center')
+    # render the dataframe as a table
+    table = ax.table(cellText=volume_data.values, colLabels=volume_data.columns, loc="center", cellLoc="center")
 
-    # Save the table as an image in a BytesIO object
+    # save the table as an image in a bytesio object
     img_buf = io.BytesIO()
-    plot.savefig(img_buf, format='png', bbox_inches='tight', pad_inches=0.05)
-    img_buf.seek(0)  # Rewind the buffer to the beginning
+    plot.savefig(img_buf, format="png", bbox_inches="tight", pad_inches=0.05)
+    img_buf.seek(0)  # rewind the buffer to the beginning
 
-    # Optionally, encode the image to base64 to embed in HTML directly
-    volume_img = base64.b64encode(img_buf.getvalue()).decode('utf-8')
+    # optionally, encode the image to base64 to embed in html directly
+    volume_img = base64.b64encode(img_buf.getvalue()).decode("utf-8")
 
     return render_template("/volume.html", volume_img=volume_img)
     
@@ -82,10 +85,13 @@ def volume():
 @app.route("/strength", methods=["GET"])
 @login_required
 def strength():
+    # https://www.geeksforgeeks.org/how-to-plot-a-dataframe-using-pandas/
+    # is a resource i used to create the line graph
+    # as well as https://www.w3schools.com/python/pandas/pandas_plotting.asp
     conn, c = sqlite3_conn()  # establish a connection to the database
     graphs = {}  # dictionary where key = exercise name and value = line graph
 
-    # sql query to get the sexercises actually logged
+    # sql query to get the exercises actually logged
     exercises = c.execute("""SELECT DISTINCT exercises.name AS exercise
                               FROM exercises
                               JOIN logs ON exercises.id = logs.exercise_id
@@ -113,17 +119,17 @@ def strength():
 
         # plot the graph
         plot.plot(strength_data["date"], strength_data["highest_weight"], color="skyblue")
-        plot.xlabel("Date")
-        plot.ylabel("Weight")
-        plot.title(f"Strength stats for {exercise}")
+        plot.xlabel("date")
+        plot.ylabel("weight")
+        plot.title(f"strength stats for {exercise}")
 
-        # save the plot to a BytesIO object to send it as an image
+        # save the plot to a bytesio object to send it as an image
         img = io.BytesIO()
         plot.savefig(img, format="png")
         img.seek(0)
 
         # encode the image to base64 for embedding in the html template
-        graphs[exercise] = base64.b64encode(img.getvalue()).decode('utf8')
+        graphs[exercise] = base64.b64encode(img.getvalue()).decode("utf8")
 
     conn.close()  # close the database connection
     return render_template("strength.html", graphs=graphs)  # render the template and pass the graphs dictionary
@@ -144,15 +150,14 @@ def routine_names():
         routines = c.fetchall()
         print("routines fetched:", routines)  # debug print to check if the data is retrieved
         conn.close()
-        
+
         # extract the routine names from the results and return as json
         routine_names = [routine[0] for routine in routines]
         return jsonify(routine_names)
-    
+
     except Exception as e:
         print("error fetching routine names:", e)
         return jsonify([])  # in case of error, return an empty list
-
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
@@ -163,52 +168,51 @@ def index():
         print(request.form)
         # get date values from the form
         date = get_form_date("entry-date")
-        # I had this function, date = format_date(date), because I thought I needed to convert the date obj to a string
-        # but I found out sqlite3 will only allow inserting the obj and not a string so I removed it 
+        # i had this function, date = format_date(date), because i thought i needed to convert the date obj to a string
+        # but i found out sqlite3 will only allow inserting the obj and not a string so i removed it
 
         # get exercise id to insert based on name from exercise selected from input field
         exercises_list = request.form.getlist("exercises[]")
         weights_list = request.form.getlist("weights[]")
         reps_list = request.form.getlist("reps[]")
 
-        print(f"Exercises: {exercises_list}")
-        print(f"Weights: {weights_list}")
-        print(f"Reps: {reps_list}")
+        print(f"exercises: {exercises_list}")
+        print(f"weights: {weights_list}")
+        print(f"reps: {reps_list}")
 
         # loop over each exercise and corresponding set value
         for exercise_name, weight, reps in zip(exercises_list, weights_list, reps_list):
             # check if they inputted a valid exercise
-            exercise_obj = Exercise.query.filter_by(name=exercise_name).first() 
+            exercise_obj = Exercise.query.filter_by(name=exercise_name).first()
             if exercise_obj is None:
-                flash("Did you forget to put in an exercise?")
+                flash("did you forget to put in an exercise?")
                 continue
             try:
-            # create a new log entry if exercise name is valid and obj is created
+                # create a new log entry if exercise name is valid and obj is created
                 new_log = Log(
-                user_id=session["user_id"],
-                date=date,
-                exercise_id=exercise_obj.id,
-                weight=try_int(weight),
-                reps=try_int(reps)                
+                    user_id=session["user_id"],
+                    date=date,
+                    exercise_id=exercise_obj.id,
+                    weight=try_int(weight),
+                    reps=try_int(reps)
                 )
 
                 # add the new log entry to the session
                 db.session.add(new_log)
-                print(f"Inserting log entry: user_id={session['user_id']}, date={date}, exercise_id={exercise_obj.id}, weight={weight}, reps={reps}")
-
+                print(f"inserting log entry: user_id={session['user_id']}, date={date}, exercise_id={exercise_obj.id}, weight={weight}, reps={reps}")
 
             except Exception as e:
                 # handle the exception, flash an error message
-                flash(f"Error logging set for {exercise_name}: {str(e)}", "danger")
+                flash(f"error logging set for {exercise_name}: {str(e)}", "danger")
                 db.session.rollback()  # rollback any changes made if there's an error
                 continue  # continue to the next iteration if an error occurs
 
         try:
             db.session.commit()  # commit all changes to the database
-            flash("Sets logged successfully!", "success")
+            flash("sets logged successfully!", "success")
         except Exception as e:
             db.session.rollback()  # rollback changes if commit fails
-            flash(f"Error committing the data: {str(e)}", "danger")
+            flash(f"error committing the data: {str(e)}", "danger")
 
         # re-render the form with the previous values filled in
         return render_template("index.html", exercises=exercises)
@@ -233,16 +237,16 @@ def full_routine():
             """, (routine_name, session["user_id"])).fetchall()
         conn.close()
 
-        # Check if any results are returned
+        # check if any results are returned
         if routine:
-            # Return the results as a list of dictionaries
+            # return the results as a list of dictionaries
             routine_data = [{
                 'exercise_name': row['exercise_name'],
                 'sets': row['sets'],
                 'part': row['part']
             }for row in routine]
             print(routine_data)
-            return jsonify(routine_data)  # Return data as JSON
+            return jsonify(routine_data)  # return data as JSON
         else:
             return jsonify({"error": "routine not found"}), 404
 
@@ -341,7 +345,7 @@ def forgot_password():
     email_hash = hash_email(email)
     email_result = User.query.filter_by(email_hash=email_hash).first()
     if email_result:
-        # Generate the reset message and send the email
+        # generate the reset message and send the email
         msg = Message(
             'Password Reset Request',
             sender=app.config['MAIL_USERNAME'],
@@ -361,19 +365,22 @@ def forgot_password():
     return redirect("/login.html")
 
 
-# below are all the route associated with authorizing accounts
+# below are all the routes associated with authorizing accounts
 
 
 @app.route('/resetPassword', methods=["GET", "POST"])
 def reset_password():
+    """ https://www.geeksforgeeks.org/sending-emails-using-api-in-flask-mail/ 
+    and https://nrodrig1.medium.com/flask-mail-reset-password-with-token-8088119e015b
+    was used to structure how to send an email via flask mail"""
     token = request.args.get('token')  # Retrieve the token from the URL
 
-    # Verify the token and perform any necessary checks (like expiration)
+    # verify the token and perform any necessary checks (like expiration)
     if not token:
         flash("The reset link is invalid.", "error")
         return redirect("/login")
 
-    # Assuming you are saving the token somewhere (e.g., in the database)
+    # assuming you are saving the token somewhere (e.g., in the database)
     conn, c = sqlite3_conn()  # Connect to your database
     c.execute("SELECT * FROM password_reset_tokens WHERE token = ?", (token,))
     token_record = c.fetchone()
@@ -382,7 +389,7 @@ def reset_password():
         flash("The reset link is invalid or expired.", "error")
         return redirect("/login")
 
-    # If the token is valid, allow the user to reset their password
+    # if the token is valid, allow the user to reset their password
     if request.method == "POST":
         new_password = request.form.get("new-password", "").strip()
         new_password_confirmation = request.form.get("new-password-confirmation", "").strip()
@@ -391,11 +398,11 @@ def reset_password():
             new_password_hash = generate_password_hash(new_password)
             email = token_record[1]  # Assuming the email is stored with the token
 
-            # Update the password in the database
+            # update the password in the database
             c.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_password_hash, email))
             conn.commit()
 
-            # Optionally delete the token from the database after successful reset
+            # optionally delete the token from the database after successful reset
             c.execute("DELETE FROM password_reset_tokens WHERE token = ?", (token,))
             conn.commit()
 

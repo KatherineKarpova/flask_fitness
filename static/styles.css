@@ -14,15 +14,15 @@ label {
     margin-bottom: 0px;
 }
 h1 {
-    color: #890363; /* Sets the text color for links */
+    color: #890363; /* sets the text color for links */
     font-size: 20px;
 }
-/* Show dropdown menu when hovering over the parent */
+/* show dropdown menu when hovering over the parent */
 .nav-item.dropdown:hover .dropdown-menu {
     font-weight: bold;
     }
 
-/* Hide the dropdown by default (Bootstrap handles it with display: none) */
+/* hide the dropdown by default (bootstrap handles it with display: none) */
 .dropdown-menu {
     display: none;
     position: absolute;
@@ -30,7 +30,7 @@ h1 {
     background-color: #ffffff;;
 }
 
-/* Optional: Add spacing between the items */
+/* optional: add spacing between the items */
 .dropdown-menu .dropdown-item {
     padding: 10px;
     font-size: 20px;
@@ -39,8 +39,8 @@ h1 {
 }
 
 .dropdown-menu .dropdown-item:hover {
-    background-color: #f91c75; /* Your desired hover background color */
-    color: #ffffff; /* Optional: Change text color for contrast */
+    background-color: #f91c75; /* your desired hover background color */
+    color: #ffffff; /* optional: change text color for contrast */
 }
 
 /* body */
@@ -72,9 +72,9 @@ nav {
     font-weight: bold;
     color: #f3a6d6;
     text-shadow: 
-        -1px -1px 0 #f91c75, /* Top left shadow */
-        1px -1px 0 #f91c75,  /* Top right shadow */
-        -1px 1px 0 #f91c75,  /* Bottom left shadow */
+        -1px -1px 0 #f91c75, /* top left shadow */
+        1px -1px 0 #f91c75,  /* top right shadow */
+        -1px 1px 0 #f91c75,  /* bottom left shadow */
         1px 1px 0 #f91c75; 
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -83,9 +83,9 @@ nav {
 .navbar-brand:hover {
     color: #ff4c8b;
     text-shadow: 
-        -1px -1px 0 , #f3a6d6/* Top left shadow */
-        1px -1px 0 #f3a6d6,  /* Top right shadow */
-        -1px 1px 0 #f3a6d6,  /* Bottom left shadow */
+        -1px -1px 0 , #f3a6d6/* top left shadow */
+        1px -1px 0 #f3a6d6,  /* top right shadow */
+        -1px 1px 0 #f3a6d6,  /* bottom left shadow */
         1px 1px 0 #f3a6d6; 
 }
 .navbar-nav .nav-link {
@@ -141,7 +141,6 @@ nav {
 }
 
 
-/* exercise entry container */
 /* exercise entry container */
 #exercise-container {
     display: flex;
@@ -263,3 +262,4 @@ select:focus {
 #entry-date .year {
     width: 80px; /* width for the year select */
 }
+

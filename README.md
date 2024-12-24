@@ -1,39 +1,111 @@
-# YOUR PROJECT TITLE
-#### Video Demo:  <URL HERE>
-#### Description:
-TODO
-# intro
-I decided to create a web application with python, flask, javascript, and sql to track my workouts in a user friendly way. Since it is intended for my personal use the design is aesthentically simple and specific to measuring what I care about.
+# Workout Tracker Web Application  
 
-# register/login
-Although this is intended for my own use, I require an account so that other people can use this app if they want to. A user must register with an email, instead of a username for simplicity, and of course a password. A check is made to ensure it is a working email with the validate_email function from the email_validator library. For simplicity, an email takes place of a username and has the ability to retrieve a forgetton password. Both the email and password are hashed for security and stored as such in the users table.
+### **Video Demo:**  
+[Insert Video URL Here]  
 
-# database design
-The database it saved as fitness.db and sql commands used that are not within app.py are stored in a file called fitness.sql. There is a users table to connect with workout logs. The exercises table stores the name of an exercise with an id, so it can be referenced in logs and store which muscles it works. The muscles table contains the name with an id referenced in the muscles worked table, representing a one to many relationship. There is a table to store which muscle are engaged for each exercise in the muscles_worked table, containing the exercise id, muscle id, and whether their role is as a prime mover or synergist. The reason for this is so that I are measure general volume on a weekly basis. The logs table stores which exercise is performed with the id, the user's id, the date, weight in pounds and the number of reps.
+### **Description:**  
+This project is a web application designed to track workouts efficiently and provide valuable insights into training progress. Built using Python, Flask, JavaScript, and SQL, the application offers a user-friendly interface with a focus on tracking metrics that matter most to the user.  
 
-# exercises.csv and import_csv.py
-A csv file containing exercise name, the type they are, movement pattern, and what muscles are worked as a prime mover or synergists. It was processed in a separate python file that takes the csv file as a command line argument. The file checks for the number of command line arguments and makes sure the second one is a csv file. 
-It checks for exercises or muscles that are already stored to prevent duplication. To accomplish this I made a reusable boolean function that takes the parameters of the table name, column name, and value to see if that combination already exists. If it is not, the data is inserted into the database. This gives me the ability to add more exercises to the csv and reuse "import_exercises.py", instead of manually inserting into multiple tables.
+---
 
-# use of sqlalchemy
-I started out only using sqlite3, but halfway through switched to using sqlalchemy because of issues with it being open in multiple threads. I left everything that was working as is with the sqlite3 connection and made sure it is closed after every use.
-Sqlalchemy seemed to only be needed if I was fetching data from a GET route from the front end.
-In order to use sqlalchemy I had to create models for the tables in the database. Although I could have omitted certain tables based on my application, I added all of them in case I wanted to impelment them later on. 
+## Table of Contents  
+- [Introduction](#introduction)  
+- [Authentication System](#authentication-system)  
+- [Database Design](#database-design)  
+- [Exercise Data Import](#exercise-data-import)  
+- [Integration of SQLAlchemy](#integration-of-sqlalchemy)  
+- [Routine Management](#routine-management)  
+- [Workout Logging](#workout-logging)  
+- [Statistics and Analysis](#statistics-and-analysis)  
 
-There two routes to collect data from the database and return it in json format to be used in javascript on the front end. One is to get the names of all the routines saved in the database to show it in the select menu to select which one to follow or edit. Another one is to get the exercises and corresponding number of sets for the select routine.
+---
 
-# create and edit routines
+## **Introduction**  
+This web application serves as a personal workout tracker, leveraging modern web technologies to create an intuitive and effective tool for logging and analyzing workout data. Although primarily developed for personal use, the application’s functionality and design allow others to utilize it as well. The aesthetic approach is deliberately minimalistic, emphasizing functionality and relevance to individual fitness goals.  
 
-Additional tables were added later on in order to store routines. The table called routines contains the names of routines, their id number, and the user's id are stored in one. Then, there is a table that has each exercise assigned to the routine and number of sets for each exercise, as based on the routine's id.
+---
 
-There two routes to collect data from the database and return it in json format to be used in javascript on the front end. The route "routine_names" is to get the names of all the routines saved in the database to show it in the select menu to select which one to follow or edit. The route "full_routine" is to get the exercises and corresponding number of sets for the select routine.
+## **Authentication System**  
+To enhance usability and security, the application includes a registration and login system. User registration requires an email and password, ensuring a streamlined process. Emails serve as unique identifiers and allow for password recovery if needed. The `validate_email` function from the `email_validator` library ensures email validity during registration. Both email addresses and passwords are securely hashed before being stored in the `users` table.  
 
-There is a html form where a user can create their own routine with the name, exercises, and sets per exercise.
-Once they submit the form, the data to inserted into the "routines" and "routine_exercises" using the create_routine route in app.py.
+---
 
-Existing routines can be edited, and updated in the database upton submission.
-There is a menu to select the routine that is being edited, and a form appears below. It is prefilled with the selected routine's name, exercises and sets, as fetched from the backend.
+## **Database Design**  
+The database, named `fitness.db`, is structured to efficiently store workout data and related entities. Additional SQL commands, beyond those implemented in `app.py`, are housed in a separate `fitness.sql` file.  
 
-# record a workout
+### Database Tables  
+- **Users Table**: Links user accounts to workout logs.  
+- **Exercises Table**: Stores exercise names and their IDs, along with information about the muscles they target.  
+- **Muscles Table**: Defines muscle names and IDs, forming a many-to-one relationship with exercises.  
+- **Muscles_Worked Table**: Captures relationships between exercises and the muscles they engage, including roles as prime movers or synergists.  
+- **Logs Table**: Records workout entries, storing the exercise ID, user ID, date, weight (in pounds), and repetitions.  
 
-The main purpose of the application is to record each workout. The data is set up to have a select menu for the month, day, and year. It is set to automatically show today's date, but can be altered. The number of days shown in the menu is adjusted based on the month and year chosen. There is a select menu to choose a routine to follow, as is used on the page for editing routines. A form is generated that has each exercise in the routine as an input field. Below each exercise, there are two input fields for the weight and for reps that are shown for how many sets the exercise has in the routine. There is a button to add a new exercise that can autocomplete something typed based on a datalist of exercises in the database. There is an add set button for if you want to add another set by input weight and reps to a corresponding exercise. Upon submission, the workout is inserted into the database. The exercises, weights, and reps are treated as lists that get zipped together. If a exercise is not in the database, the insertation is skipped. If a weight is not provided, it is defaulted to 0 and assumed to have been a bodyweight exercise. Reps are able to be null in the case the exercise is static. 
+This schema ensures a scalable and normalized database structure capable of tracking complex relationships and facilitating analytics.  
+
+---
+
+## **Exercise Data Import**  
+The application includes an `exercises.csv` file containing exercise metadata such as type, movement pattern, and targeted muscles. To populate the database, a separate Python script, `import_csv.py`, processes the CSV file.  
+
+### Features  
+- Command-line argument validation ensures the input file is a valid CSV.  
+- Duplicate prevention using a reusable boolean function that checks table and column combinations for existing entries.  
+- Automatic insertion of new data into the database.  
+
+This design allows seamless updates to the exercise database by simply extending the CSV file and re-executing the script.  
+
+---
+
+## **Integration of SQLAlchemy**  
+Initially, SQLite3 was used for database interactions. However, to resolve issues with multi-threading, SQLAlchemy was integrated mid-development.  
+
+### Key Features  
+- SQLAlchemy is used for database operations in routes requiring data retrieval for the frontend.  
+- Models were created for all database tables to future-proof the application, enabling potential expansion without altering the schema.  
+
+---
+
+## **Routine Management**  
+The application allows users to create and edit workout routines, supported by additional tables:  
+
+### Routine Tables  
+- **Routines Table**: Stores routine names, IDs, and associated user IDs.  
+- **Routine_Exercises Table**: Tracks exercises within each routine and the corresponding number of sets.  
+
+### Features  
+- **Create Routine**: Users input routine details via an HTML form, which are stored in the database through the `create_routine` route.  
+- **Edit Routine**: Users select a routine to edit, with the current configuration prefilled in a form. Submissions update the database accordingly.  
+
+Data for routines is fetched using JSON routes (`routine_names` and `full_routine`) to dynamically populate forms on the frontend.  
+
+---
+
+## **Workout Logging**  
+The core functionality of the application is logging workouts.  
+
+### Features  
+- **Date Selection**: Users select a date via dropdown menus, defaulting to the current date with adjustments for varying month lengths and leap years.  
+- **Routine Selection**: A dropdown menu populated from the database allows users to select a routine.  
+- **Dynamic Input Forms**: Forms auto-generate input fields for each exercise in the routine, with fields for weight and repetitions per set.  
+
+### Additional Functionality  
+- Autocomplete suggestions for adding new exercises.  
+- Dynamic addition of extra sets or exercises.  
+- Validation to skip exercises not in the database or assign default values (e.g., weight defaults to 0 for bodyweight exercises).  
+
+Workout data is submitted as lists, zipped together, and inserted into the database, ensuring accurate and structured logging.  
+
+---
+
+## **Statistics and Analysis**  
+The application provides statistical insights by analyzing workout logs to identify trends in strength and training volume.  
+
+### Implementation  
+- Uses the Pandas library to process workout data into a DataFrame.  
+- Visualizes data as images embedded directly into the webpage, simplifying frontend complexity.  
+
+This approach ensures detailed, customizable analytics while maintaining a seamless user experience.  
+
+---
+
+This application combines a streamlined user experience with robust backend functionality, serving as a comprehensive tool for tracking and improving fitness performance. Future iterations may include enhanced visualizations, expanded exercise libraries, and real-time analytics.  

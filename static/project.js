@@ -1,44 +1,43 @@
-
-
+// this is to add 2 input fields containing lbs and reps together
+// since then are used together for the record form
 function addSetInfo(set_num, exerciseDiv) {
-    const setDiv = document.createElement('div');  // Create a container for each set
+    const setDiv = document.createElement('div'); // create a container for each set
     setDiv.classList.add("set-entry");
 
-    // Create the label specifying which set it is
+    // create the label specifying which set it is
     const label = document.createElement("label");
-    label.textContent = `Set ${set_num}`;  // Dynamically set the label text based on the set number
+    label.textContent = `Set ${set_num}`; // dynamically set the label text based on the set number
     setDiv.appendChild(label);
 
-    // Add input fields for weights and reps
+    // add input fields for weights and reps
     addInput("weights[]", "lbs", setDiv, "short-input");
     addInput("reps[]", "reps", setDiv, "short-input");
     if (exerciseDiv) {
-        // Append the new set div under the exercise div
-        exerciseDiv.appendChild(setDiv);  // Append the set container to the exercise div
+        // append the new set div under the exercise div
+        exerciseDiv.appendChild(setDiv); // append the set container to the exercise div
     }
 }
 
-
-// Function to handle delete button and confirmation
+// function to handle delete button and confirmation
 function deleteRoutineEvent() {
     const deleteButton = document.getElementById("delete-button");
     const deleteConfirmation = document.getElementById("delete-confirmation");
     const cancelButton = document.getElementById("cancel-button");
 
     deleteButton.addEventListener("click", function() {
-        // Show the confirmation section and hide the original delete button
-    deleteConfirmation.style.display = "block";  // Show confirmation buttons
-    deleteButton.style.display = "none";         // Hide original delete button
+        // show the confirmation section and hide the original delete button
+        deleteConfirmation.style.display = "block"; // show confirmation buttons
+        deleteButton.style.display = "none"; // hide original delete button
     });
     cancelButton.addEventListener("click", function() {
-        // Hide the confirmation buttons and show the original delete button again
+        // hide the confirmation buttons and show the original delete button again
         deleteConfirmation.style.display = "none";
         deleteButton.style.display = "inline";
     });
 }
 
 // get the exercises and corresponding sets from the backend for selected routine
-// Function to fetch routine data
+// function to fetch routine data
 function getRoutineData(routineName) {
     return new Promise((resolve, reject) => {
         fetch('/full_routine', {
@@ -50,29 +49,30 @@ function getRoutineData(routineName) {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         })
-        .then(response => response.json())  // The response should be JSON
+        .then(response => response.json()) // the response should be json
         .then(data => {
-            console.log("Fetched Routine Data:", data);  // Log the fetched data
-            resolve(data);  // Resolve the promise with the routine data
+            console.log("fetched routine data:", data); // log the fetched data
+            resolve(data); // resolve the promise with the routine data
         })
         .catch(error => {
-            console.error("Error fetching full routine data:", error);
-            reject(error);  // Reject the promise in case of an error
+            console.error("error fetching full routine data:", error);
+            reject(error); // reject the promise in case of an error
         });
     });
 }
+
 
 function validateRoutineData(routineData) {
     console.log("Validating routineData:", routineData);
     console.log("Is routineData an array?", Array.isArray(routineData));
 
-    // Check if routineData is an array
+    // check if routineData is an array
     if (!Array.isArray(routineData)) {
         console.error("Invalid routine data: Expected an array but got:", routineData);
-        return false; // Return false explicitly
+        return false; // return false explicitly
     }
 
-    // Validate each element in the array
+    // validate each element in the array
     const isValid = routineData.every(row => {
         const hasRequiredProperties = row.hasOwnProperty('exercise_name') && row.hasOwnProperty('sets');
         if (!hasRequiredProperties) {
@@ -87,7 +87,7 @@ function validateRoutineData(routineData) {
     }
 
     console.log("Routine data validated successfully.");
-    return true; // Return true if validation passes
+    return true; // return true if validation passes
 }
 
 // fetch exercises in json from backend and create datalist
@@ -110,7 +110,7 @@ function exerciseDatalist() {
                     datalist.appendChild(option);
                 });
 
-                resolve(datalist);  // Resolve the promise with the populated datalist
+                resolve(datalist);  // resolve the promise with the populated datalist
             })
             .catch(error => {
                 console.error("Error fetching exercise data:", error);
@@ -121,22 +121,22 @@ function exerciseDatalist() {
 
 // add exercise button clicked event listener
 // attach the event listener for "add exercise" after it's added to the dom
-// Function to handle adding exercise inputs
+// function to handle adding exercise inputs
 function addExerciseSetsEvent() {
     document.getElementById("add-exercise").addEventListener("click", function() {
         const exerciseContainer = document.getElementById("add-exercise-container");
 
         if (exerciseContainer) {
-            // Create a new div for the exercise entry
+            // create a new div for the exercise entry
             const newExerciseDiv = document.createElement("div");
             newExerciseDiv.classList.add("exercise-entry");
 
-            // Call inputExercise to populate the new div with exercise inputs
+            // call inputExercise to populate the new div with exercise inputs
             inputExercise(newExerciseDiv).then(() => {
-                // After populating the exercise data list, add input for sets
+                // cfter populating the exercise data list, add input for sets
                 addInput("sets[]", "sets", newExerciseDiv, "short-input");
 
-                // Append the new exercise div to the container
+                // append the new exercise div to the container
                 exerciseContainer.appendChild(newExerciseDiv);
             }).catch(error => {
                 console.error("Error populating exercise data:", error);
@@ -153,29 +153,29 @@ function inputExercise(ExerciseDiv) {
             return reject("ExerciseDiv is not defined.");
         }
 
-        // Create the input field for exercise
+        // create the input field for exercise
         const exerciseInput = document.createElement("input");
-        const datalistId = "exercise-list-" + new Date().getTime(); // Unique id for each datalist
-        exerciseInput.setAttribute("list", datalistId);  // Link the input field with the unique datalist
+        const datalistId = "exercise-list-" + new Date().getTime(); // unique id for each datalist
+        exerciseInput.setAttribute("list", datalistId);  // link the input field with the unique datalist
         exerciseInput.setAttribute("name", "exercises[]");
         exerciseInput.setAttribute("class", "long-input");
 
-        // Set placeholder for the exercise input
+        // set placeholder for the exercise input
         exerciseInput.setAttribute("placeholder", "exercise");
 
-        // Append the input element to the ExerciseDiv
+        // append the input element to the ExerciseDiv
         ExerciseDiv.appendChild(exerciseInput);
 
-        // Fetch the exercise data and create the datalist
+        // fetch the exercise data and create the datalist
         exerciseDatalist()
             .then(datalist => {
-                // Set the datalist ID to match the input's datalist attribute
+                // set the datalist ID to match the input's datalist attribute
                 datalist.setAttribute("id", datalistId);
                 
-                // Append the datalist to the ExerciseDiv
+                // append the datalist to the ExerciseDiv
                 ExerciseDiv.appendChild(datalist);
 
-                // Resolve the promise and return the exerciseInput element
+                // resolve the promise and return the exerciseInput element
                 resolve(exerciseInput);
             })
             .catch(error => {
@@ -192,18 +192,18 @@ function inputExercise(ExerciseDiv) {
 function addInput(name, placeholder, newDiv, cssClass) {
     const input = document.createElement("input");
 
-    // Set attributes for the input
-    input.setAttribute("type", "text");  // Type text for versatility with letters and numbers
-    input.setAttribute("name", name);  // Dynamic name (sets[] for multiple sets)
+    // set attributes for the input
+    input.setAttribute("type", "text");  // type text for versatility with letters and numbers
+    input.setAttribute("name", name);  // dynamic name (sets[] for multiple sets)
     if (placeholder) input.setAttribute("placeholder", placeholder);
 
-    // Add the passed cssClass to the input to adjust its width
+    // add the passed cssClass to the input to adjust its width
     input.classList.add(cssClass);
 
-    // Append the new input field to the provided div
+    // append the new input field to the provided div
     newDiv.appendChild(input);
 
-    // Return the input element so we can chain operations on it if needed
+    // return the input element so I can chain operations on it if needed
     return input;
 }
 
@@ -221,27 +221,27 @@ function editRoutineForm(routineData) {
     routineData.forEach(row => {
         const exerciseDiv = document.createElement('div');  // Create div for each exercise
 
-        // Call inputExercise and wait for it to resolve before setting values
+        // call inputExercise and wait for it to resolve before setting values
         inputExercise(exerciseDiv).then(exerciseInput => {
-            // Ensure the input is returned before setting its value
+            // ensure the input is returned before setting its value
             if (exerciseInput) {
                 exerciseInput.value = row.exercise_name;  // Set the exercise name
 
-                // Create an input field for sets and set the value
+                // create an input field for sets and set the value
                 const setsInput = addInput('sets[]', '', exerciseDiv, 'short-input');
                 setsInput.value = row.sets;  // Set the number of sets
 
-                // Append the entire exerciseDiv (with exercise name and sets) to the container
+                // append the entire exerciseDiv (with exercise name and sets) to the container
                 routineContainerElement.appendChild(exerciseDiv);
                 exerciseDatalist()
             .then(datalist => {
-                // Set the datalist ID to match the input's datalist attribute
+                // set the datalist ID to match the input's datalist attribute
                 datalist.setAttribute("id", datalistId);
                 
-                // Append the datalist to the ExerciseDiv
+                // append the datalist to the ExerciseDiv
                 ExerciseDiv.appendChild(datalist);
 
-                // Resolve the promise and return the exerciseInput element
+                // resolve the promise and return the exerciseInput element
                 resolve(exerciseInput);
             })
             .catch(error => {
@@ -258,7 +258,7 @@ function editRoutineForm(routineData) {
 }
 
 function followRoutineForm(routineData) {
-    console.log(routineData);  // Log the data to verify it's correct
+    console.log(routineData);  // log the data to verify it's correct
     validateRoutineData(routineData);
     let lastExerciseDiv = null;
     const routineContainerElement = document.getElementById("routine-container");
@@ -269,13 +269,13 @@ function followRoutineForm(routineData) {
     }
 
     routineData.forEach(row => {
-        // Create a div for each exercise
+        // create a div for each exercise
         const newExerciseDiv = document.createElement('div');
         let lastExerciseDiv = newExerciseDiv;
-        // First, add the exercise name
+        // first, add the exercise name input field
         inputExercise(newExerciseDiv).then(exerciseInput => {
             if (exerciseInput) {
-                // Set the exercise name
+                // set the exercise name to what it in the data
                 exerciseInput.value = row.exercise_name;
                 exerciseInput.disabled = true;  // Disable to prevent editing the exercise name
                 lastExerciseDiv = newExerciseDiv;
@@ -283,47 +283,20 @@ function followRoutineForm(routineData) {
                 console.error("exerciseInput was not returned correctly.");
             }
 
-            // Now, for each set, add `lbs` and `reps` inputs
+            // now, for each set, add `lbs` and `reps` inputs
             for (let i = 0; i < row.sets; i++) {
-                // Create and append input fields for weight and reps for each set
+                // create and append input fields for weight and reps for each set
                 addSetInfo(i + 1);
                 if (lastExerciseDiv) {
                     addSetInfo(i + 1, lastExerciseDiv);
                 }
             }
-            // After creating the inputs for all sets, append the whole exerciseDiv to the container
+            // after creating the inputs for all sets, append the whole exerciseDiv to the container
             routineContainerElement.appendChild(lastExerciseDiv);
         }).catch(error => {
             console.error("Error creating exercise input:", error);
         });
     });
-}
-
-// display routine data in an html table
-function routineTable(data) {
-    const routineContainer = document.getElementById('routine-table-container');
-    routineContainer.innerHTML = '';  // Clear any previous table data
-
-    const table = document.createElement('table');
-    table.classList.add('routine-table');
-
-    const header = table.createTHead();
-    const headerRow = header.insertRow();
-    headerRow.innerHTML = `
-        <th>exercise</th>
-        <th>sets</th>
-    `;
-
-    const body = table.createTBody();
-    data.forEach(row => {
-        const rowElement = body.insertRow();
-        rowElement.innerHTML = `
-            <td>${row.exercise_name}</td>
-            <td>${row.sets}</td>
-        `;
-    });
-
-    routineContainer.appendChild(table);
 }
 
 // reuse html to select routine 
@@ -334,6 +307,7 @@ function routineSelect(){
     }
 
 }
+
 // function to fetch routines from the server and populate the select menu
 function getRoutines() {
     // fetch the routine data from the flask backend
@@ -366,6 +340,7 @@ function getRoutines() {
 }
 
 // helper function to return the list of months (name only)
+// I searched online and saw you have to create one yourself 
 function months() {
     return [
         "January", "February", "March", "April", "May", "June",
@@ -373,7 +348,7 @@ function months() {
     ];
 };
 
-// inner html for date form
+// inner html for date form where the id is altered to have a unique id
 function dateForm(formId) {
     const formContainer = document.getElementById(formId);
     if (formContainer) {
@@ -392,6 +367,9 @@ function dateForm(formId) {
 };
 
 // define elements with unique id from html
+// I noticed I had to do this process in other functions
+// so I made it a seperate functions, where I can use it to define elements
+// and pass the elements as a parameter
 function defineDateElements(formId) {
     const monthElement = document.getElementById(`month-${formId}`);
     const dayElement = document.getElementById(`day-${formId}`);
@@ -450,7 +428,6 @@ function populateYearDropdown(elements) {
 // set today's date in the form (for default selection)
 function setToday(elements) {
     const today = new Date();
-
     // set the current month, day, and year
     elements.monthElement.value = today.getMonth() + 1; // months are zero-based, so add 1
     // elements.dayElement.value = today.getDate();
@@ -459,10 +436,8 @@ function setToday(elements) {
     elements.dayElement.value = paddedDay;
 }; 
 
-// set to date of first log
-
-
 // fetch exercises in json from backend and create datalist
+// this is to make add exercised easy and ensure the intended exercise matches what is already in the db
 function exerciseDatalist() {
     return new Promise((resolve, reject) => {
         fetch("/json_exercises")
@@ -493,22 +468,22 @@ function exerciseDatalist() {
 
 // add exercise button clicked event listener
 // attach the event listener for "add exercise" after it's added to the dom
-// Function to handle adding exercise inputs
+// here it is expected sets will be added at the same time during a record 
 function addExerciseSetsEvent() {
     document.getElementById("add-exercise").addEventListener("click", function() {
         const exerciseContainer = document.getElementById("add-exercise-container");
 
         if (exerciseContainer) {
-            // Create a new div for the exercise entry
+            // create a new div for the exercise entry
             const newExerciseDiv = document.createElement("div");
             newExerciseDiv.classList.add("exercise-entry");
 
-            // Call inputExercise to populate the new div with exercise inputs
+            // call inputExercise to populate the new div with exercise inputs
             inputExercise(newExerciseDiv).then(() => {
-                // After populating the exercise data list, add input for sets
+                // after populating the exercise data list, add input for sets
                 addInput("sets[]", "sets", newExerciseDiv, "short-input");
 
-                // Append the new exercise div to the container
+                // append the new exercise div to the container
                 exerciseContainer.appendChild(newExerciseDiv);
             }).catch(error => {
                 console.error("Error populating exercise data:", error);
@@ -517,37 +492,38 @@ function addExerciseSetsEvent() {
     });
 }
 
+// this will generate an input field for an exercise
 function inputExercise(ExerciseDiv) {
     return new Promise((resolve, reject) => {
-        // Ensure ExerciseDiv is defined
+        // ensure ExerciseDiv is defined
         if (!ExerciseDiv) {
             console.error("ExerciseDiv is not defined.");
             return reject("ExerciseDiv is not defined.");
         }
 
-        // Create the input field for exercise
+        // create the input field for exercise
         const exerciseInput = document.createElement("input");
-        const datalistId = "exercise-list-" + new Date().getTime(); // Unique id for each datalist
-        exerciseInput.setAttribute("list", datalistId);  // Link the input field with the unique datalist
+        const datalistId = "exercise-list-" + new Date().getTime(); // unique id for each datalist
+        exerciseInput.setAttribute("list", datalistId);  // link the input field with the unique datalist
         exerciseInput.setAttribute("name", "exercises[]");
         exerciseInput.setAttribute("class", "long-input");
 
-        // Set placeholder for the exercise input
+        // set placeholder for the exercise input
         exerciseInput.setAttribute("placeholder", "exercise");
 
-        // Append the input element to the ExerciseDiv
+        // append the input element to the ExerciseDiv
         ExerciseDiv.appendChild(exerciseInput);
 
-        // Fetch the exercise data and create the datalist
+        // fetch the exercise data and create the datalist
         exerciseDatalist()
             .then(datalist => {
-                // Set the datalist ID to match the input's datalist attribute
+                // set the datalist ID to match the input's datalist attribute
                 datalist.setAttribute("id", datalistId);
                 
-                // Append the datalist to the ExerciseDiv
+                // append the datalist to the ExerciseDiv
                 ExerciseDiv.appendChild(datalist);
 
-                // Resolve the promise and return the exerciseInput element
+                // resolve the promise and return the exerciseInput element
                 resolve(exerciseInput);
             })
             .catch(error => {
@@ -557,25 +533,23 @@ function inputExercise(ExerciseDiv) {
     });
 }
 
-// input field to have in exercise containers
-// placeholder parameter because i want the weight input to say lbs not weight
 // made placeholder optional for easier implemention in the edit routine form but I might do it depending on the look while editing
 
 function addInput(name, placeholder, newDiv, cssClass) {
     const input = document.createElement("input");
 
-    // Set attributes for the input
+    // set attributes for the input
     input.setAttribute("type", "text");  // Type text for versatility with letters and numbers
     input.setAttribute("name", name);  // Dynamic name (sets[] for multiple sets)
     if (placeholder) input.setAttribute("placeholder", placeholder);
 
-    // Add the passed cssClass to the input to adjust its width
+    // add the passed cssClass to the input to adjust its width
     input.classList.add(cssClass);
 
-    // Append the new input field to the provided div
+    // append the new input field to the provided div
     newDiv.appendChild(input);
 
-    // Return the input element so we can chain operations on it if needed
+    // return the input element so we can chain operations on it if needed
     return input;
 }
 
