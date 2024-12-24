@@ -121,7 +121,7 @@ def strength():
         plot.plot(strength_data["date"], strength_data["highest_weight"], color="skyblue")
         plot.xlabel("date")
         plot.ylabel("weight")
-        plot.title(f"strength stats for {exercise}")
+        plot.title(f"{exercise}")
 
         # save the plot to a bytesio object to send it as an image
         img = io.BytesIO()
