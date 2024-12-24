@@ -1,4 +1,5 @@
 # Workout Tracker Web Application  
+By Katherine Karpova
 
 ### **Video Demo:**  
 [Insert Video URL Here]  
