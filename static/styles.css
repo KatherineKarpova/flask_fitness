@@ -1,0 +1,264 @@
+/* general reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+label {
+    padding: 10px;
+    font-size: 23px;
+    color: #ff4c8b;        
+    font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+h1 {
+    color: #890363; /* sets the text color for links */
+    font-size: 20px;
+}
+/* show dropdown menu when hovering over the parent */
+.nav-item.dropdown:hover .dropdown-menu {
+    font-weight: bold;
+    }
+
+/* hide the dropdown by default (bootstrap handles it with display: none) */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background-color: #ffffff;;
+}
+
+/* optional: add spacing between the items */
+.dropdown-menu .dropdown-item {
+    padding: 10px;
+    font-size: 20px;
+    color: #f91c75;        
+    font-weight: bold;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    background-color: #f91c75; /* your desired hover background color */
+    color: #ffffff; /* optional: change text color for contrast */
+}
+
+/* body */
+body {
+    font-family: "Arial", sans-serif;
+    background: linear-gradient(to right, #02f6c5, #f3a6d6); /* light pink to pastel purple gradient */
+    color: #6d0041; /* deep berry purple text */
+    line-height: 1.6;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center; /* align items to the top */
+    height: 100%;
+    text-align: center;
+    flex-direction: column;
+    padding-top: 0;
+    padding-bottom: 30px;
+}
+
+/* navbar styles */
+nav {
+    background-color: #ff4c8b; /* girly, bold pink */
+    border-radius: 25px; /* rounded corners for a softer look */
+    padding: 20px 30px; /* increase padding for a larger navbar */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* light shadow for depth */
+}
+
+.navbar-brand {
+    font-size: 2em; /* bigger brand font */
+    font-weight: bold;
+    color: #f3a6d6;
+    text-shadow: 
+        -1px -1px 0 #f91c75, /* top left shadow */
+        1px -1px 0 #f91c75,  /* top right shadow */
+        -1px 1px 0 #f91c75,  /* bottom left shadow */
+        1px 1px 0 #f91c75; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: "Arial", sans-serif;
+}
+.navbar-brand:hover {
+    color: #ff4c8b;
+    text-shadow: 
+        -1px -1px 0 , #f3a6d6/* top left shadow */
+        1px -1px 0 #f3a6d6,  /* top right shadow */
+        -1px 1px 0 #f3a6d6,  /* bottom left shadow */
+        1px 1px 0 #f3a6d6; 
+}
+.navbar-nav .nav-link {
+    font-size: 1.3em;  /* increase font size */
+    color: #f91c75; /* white text for links */
+    font-weight: bold;
+    margin-right: 20px;
+    padding: 8px 15px;
+    border-radius: 25px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: #f91c75;
+    color: #ffffff;
+    transform: translateY(-2px); /* hover animation */
+}
+
+.navbar-toggler {
+    border: none;
+    background-color: #ffffff; /* white background for the toggler */
+    border-radius: 50%; /* round toggle button */
+}
+
+.navbar-toggler-icon {
+    background-color: #ff4c8b; /* pink icon for the toggler */
+}
+
+/* flash messages */
+.alert {
+    border-radius: 25px;
+    background-color: #ff7b9f; /* soft pink for alert messages */
+    color: #6d0041; /* deep berry purple text */
+    font-weight: bold;
+    padding: 15px;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+    background-color: #4CAF50; /* success green */
+}
+
+.alert-danger {
+    background-color: #920a00; /* error red */
+}
+
+.alert-info {
+    background-color: #17c2f6; /* info blue */
+}
+
+
+/* exercise entry container */
+#exercise-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* space between each exercise entry */
+}
+#exercise-container .routine-name {
+    width: 300px;
+}
+/* adjustments to exercise entry */
+.exercise-entry {
+    display: flex;
+    gap: 10px;  /* space between exercise, weight, and reps inputs */
+    margin: 0;  /* remove margin to avoid unnecessary space between inputs */
+    padding: 5px 0; /* optional: add slight padding between rows */
+}
+
+/* style for the exercise input (wider and taller) */
+.long-input {
+    width: 300px;   /* wider */
+    height: 40px;   /* same height */
+    border: 2px solid #ff4c8b; /* same border style */
+    border-radius: 25px; /* rounded corners like the other inputs */
+    padding: 10px;   /* padding for a comfortable space inside */
+    font-size: 1.3em; /* same font size */
+    background-color: #fff; /* white background for select */
+    color: #6d0041; /* deep berry purple text */
+    transition: border-color 0.3s ease;
+    text-align: center;
+}
+
+/* style for the weight and reps inputs (shorter and equal size) */
+.short-input {
+    width: 70px;   /* shorter */
+    height: 40px;  /* same height */
+    border: 2px solid #ff4c8b; /* same border style */
+    border-radius: 25px; /* rounded corners like the other inputs */
+    padding: 10px;   /* padding for a comfortable space inside */
+    font-size: 1.3em; /* same font size */
+    background-color: #fff; /* white background for select */
+    color: #6d0041; /* deep berry purple text */
+    transition: border-color 0.3s ease;
+    text-align: center;
+}
+
+/* buttons */
+button, .btn {
+    background-color: #ff4c8b;
+    color: white;
+    padding: 15px 30px;
+    font-size: 1.5em;
+    border-radius: 25px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    margin: 10px
+}
+
+button:hover, .btn:hover {
+    background-color: #f91c75;
+    transform: translateY(-5px);
+}
+
+button:focus {
+    outline: none;
+}
+
+/* style for select menus (month, day, year) */
+select {   /* same width as short-input fields */
+    height: 50px;   /* same height */
+    border: 2px solid #ff4c8b; /* same border style */
+    border-radius: 25px; /* rounded corners like the other inputs */
+    padding: 5px;   /* padding for a comfortable space inside */
+    font-size: 1.2em; /* same font size */
+    background-color: #fff; /* white background for select */
+    color: #6d0041; /* deep berry purple text */
+    transition: border-color 0.3s ease;
+    margin: 10px;
+}
+.routine-select{
+    width: 200px;
+}
+select:focus {
+    border-color: #f91c75; /* border color when focused */
+    box-shadow: 0 0 10px rgba(249, 28, 117, 0.3); /* light pink glow when focused */
+}
+
+/* align the month, day, and year fields horizontally */
+#entry-date {
+    display: flex;
+    gap: 10px; /* space between month, day, and year fields */
+    justify-content: center; /* center the fields horizontally */
+}
+
+/* if you want to make sure the select boxes align with the text inputs */
+#entry-date select {
+    height: 50px;  /* same height */
+    border: 2px solid #ff4c8b; /* same border style */
+    border-radius: 25px; /* rounded corners like the other inputs */
+    padding: 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;   /* padding for a comfortable space inside */
+    font-size: 1 em; /* same font size */
+    background-color: #fff; /* white background for select */
+    color: #6d0041; /* deep berry purple text */
+    transition: border-color 0.3s ease;
+}
+
+/* specific widths for each select element */
+#entry-date .month {
+    width: 130px; /* width for the month select */
+}
+
+#entry-date .day {
+    width: 60px; /* width for the day select */
+}
+
+#entry-date .year {
+    width: 80px; /* width for the year select */
+}

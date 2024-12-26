@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+log in
+{% endblock %}
+
+{% block main %}
+<form action="/login" method="post">
+    <div class="mb-3">
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="email" placeholder="email" type="text" class="long-input" required>
+    </div>
+    <div class="mb-3">
+        <input class="form-control mx-auto w-auto" name="password" placeholder="password" type="password" class="long-input" required>
+    </div>
+    <button type="submit">log in</button>
+    <button type="button" id="forgot-password-button" name="forgot-password">forgot password</button>
+    <div id="forgot-password-container"></div>
+</form>
+
+<div id="forgot-password-form" style="display:none;">
+    <form action="/forgot-password" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" class="form-control mx-auto w-auto" name="email" placeholder="enter your email to reset password" type="email" required>
+        </div>
+        <button type="submit">send reset link</button>
+        <button type="button" id="cancel-forgot-password" class="btn btn-secondary">cancel</button>
+    </form>
+</div>
+
+<script>
+    // show the "forgot password" section when clicked
+    document.getElementById("forgot-password-button").addEventListener("click", function() {
+        const forgotPasswordContainer = document.getElementById("forgot-password-form");
+        forgotPasswordContainer.style.display = "block";  // show forgot password section
+        document.getElementById("forgot-password-button").style.display = "none";  // hide forgot password button
+    });
+
+    // handle cancel button for forgot password
+    document.getElementById("cancel-forgot-password").addEventListener("click", function() {
+        const forgotPasswordContainer = document.getElementById("forgot-password-form");
+        forgotPasswordContainer.style.display = "none";  // hide forgot password section
+        document.getElementById("forgot-password-button").style.display = "inline";  // show forgot password button again
+    });
+</script>
+
+{% endblock %}
+

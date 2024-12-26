@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    edit a routine
+{% endblock %}
+
+{% block main %}
+<form id="edit-routine-form" action="/editRoutine" method="post">
+    <div id="routine-select-container">
+        <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
+        </select>
+    </div> 
+    <input type="text" id="edit-routine-name" name="edit-routine-name" placeholder="enter routine name" class="long-input">
+    <div id="edit-routine-container"></div>
+    <div id="add-exercise-container"></div>
+    <button type="button" id="add-exercise">add exercise</button>
+    <button type="submit" name="action" value="update">update</button>
+    <button type="button" id="delete-button">delete</button>
+    <div id="delete-confirmation" style="display:none;">
+        <p>are you sure you want to delete this routine?</p>
+        <button type="submit" name="action" value="delete" class="btn btn-danger">confirm delete</button>
+        <button type="button" id="cancel-button" class="btn btn-secondary">cancel</button>
+    </div>
+</form>
+
+<script>
+    // this function runs when the window is loaded
+    window.onload = function() {
+        // call these functions to populate routine select dropdown and get available routines
+        getRoutines();
+    };
+
+    // wait for the dom to be fully loaded before executing js
+    document.addEventListener("DOMContentLoaded", function() {
+        addExerciseSetsEvent();
+        deleteRoutineEvent(); // call the delete button handler here
+
+        // handle when a routine is selected
+        document.getElementById("routine-select").addEventListener("change", function() {
+        console.log("routine selected");
+
+        const selectedRoutine = this.value;  // get the value of the selected routine
+
+        // clear the previous form data by resetting the "edit-routine-container"
+        const routineContainer = document.getElementById("edit-routine-container");
+        routineContainer.innerHTML = '';  // clears all child elements (inputs, etc.)
+
+        if (selectedRoutine) {
+
+            const editNameInput = document.getElementById("edit-routine-name");
+            // show input field for routine name that can be edited
+            editNameInput.hidden = false;
+            // fill the value with name input field the selected routine name
+            editNameInput.value = selectedRoutine;
+
+            // fetch the routine data when a routine is selected
+            getRoutineData(selectedRoutine)
+                .then(routineData => {
+                // once data is fetched, generate the form for editing exercises
+                    editRoutineForm(routineData);
+                })
+                .catch(error => {
+                    console.error("error loading routine data:", error);
+                });
+        }
+    });
+});
+
+</script>
+
+{% endblock %}

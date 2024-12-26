@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    record
+{% endblock %}
+
+{% block main %}
+<form action="/" method="post">
+    <div id="entry-date"></div>
+    <div id="routine-select-container">
+        <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
+    </div>
+    <div id="routine-container"></div>
+    <div id="exercise-container">
+        <div class="exercise-entry"></div>
+    </div>
+
+    <div id="add-exercise-container"></div>
+    <div id="add-set-container"></div>
+
+    <button type="button" id="add-exercise">add exercise</button>
+    <button type="button" id="add-set">add set</button>
+    <div id="submit-log">
+        <button type="submit">record your workout!</button>
+    </div>
+</form>
+
+<script>
+    let lastClicked = '';
+    window.onload = function() {
+        const formId = "entry-date";
+        dateForm(formId);
+        const elements = defineDateElements(formId);
+        populateYearDropdown(elements);
+        updateDays(elements);
+        setToday(elements);
+        elements.monthElement.addEventListener("change", function() {
+            updateDays(elements);
+        });
+        elements.yearElement.addEventListener("change", function() {
+            updateDays(elements);
+        });
+        getRoutines();
+    };
+
+    let set_num = 1;
+    let lastExerciseDiv = null;
+
+    document.getElementById("add-exercise").addEventListener("click", function() {
+        const exerciseContainer = document.getElementById("add-exercise-container");
+        const newExerciseDiv = document.createElement("div");
+        newExerciseDiv.classList.add("exercise-entry");
+        lastExerciseDiv = newExerciseDiv;
+        inputExercise(newExerciseDiv).then(() => {
+            addSetInfo(set_num, newExerciseDiv);
+            exerciseContainer.appendChild(newExerciseDiv);
+        }).catch(error => {
+            console.error('Error fetching exercise data:', error);
+        });
+    });
+
+    document.getElementById("add-set").addEventListener("click", function() {
+        if (lastExerciseDiv) {
+            set_num++;
+            addSetInfo(set_num, lastExerciseDiv);
+        }
+    });
+
+    document.getElementById("routine-select").addEventListener("change", async function() {
+        const selectedRoutine = this.value;
+        if (selectedRoutine) {
+            try {
+                const routineData = await getRoutineData(selectedRoutine);
+                console.log("routine data fetched")
+                if (Array.isArray(routineData)) {
+                    const routineContainerElement = document.getElementById("routine-container");
+                    routineContainerElement.innerHTML = '';
+                    followRoutineForm(routineData);
+                } else {
+                    console.error("Routine data is not an array.");
+                }
+            } catch (error) {
+                console.error("Error fetching routine data:", error);
+            }
+        }
+    });
+</script>
+{% endblock %}

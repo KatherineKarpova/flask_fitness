@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Strength
+{% endblock %}
+
+{% block main %}
+<form action="/stats" method="get">
+    <div id="strength-container">
+        <label>Strength Progress</label>
+        {% for exercise, graph in graphs.items() %}
+            <h1>{{ exercise }}</h1>
+            <img src="data:image/png;base64,{{ graph | e }}" alt="{{ exercise }}">
+        {% endfor %}
+    </div>
+</form>
+{% endblock %}

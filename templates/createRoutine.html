@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    create a routine
+{% endblock %}
+
+{% block main %}
+<form action="/createRoutine" method="post">
+    <div id="create-routine-container">
+        <div>
+            <label for="routine-name">routine name</label>
+        </div>
+        <input type="text" name="routine-name" placeholder="routine name" class="long-input">
+        <!-- dynamic fields for exercises and sets -->
+        <div id="add-exercise-container">
+        <!-- initial exercise and set fields will be displayed here -->
+        </div>
+        <button type="button" id="add-exercise">add exercise</button>
+    </div>
+    <button type="submit" name="action" value="save">save routine</button>
+</form>
+
+<script>
+    // attach the event listener for "add exercise" after it's added to the dom
+    document.getElementById("add-exercise").addEventListener("click", function() {
+        const exerciseContainer = document.getElementById("add-exercise-container");
+
+        if (exerciseContainer) {
+            // create a new div for the exercise entry
+            const newExerciseDiv = document.createElement("div");                
+            newExerciseDiv.classList.add("exercise-entry");
+
+            // add exercise inputs (e.g., exercise name, sets)
+            inputExercise(newExerciseDiv).then(() => {
+            // after populating the exercise datalist, add input for sets
+            addInput("sets[]", "sets", newExerciseDiv, "short-input");
+            // append the new exercise div to the container
+            exerciseContainer.appendChild(newExerciseDiv);
+            }).catch(error => {
+                console.error("error fetching exercise data:", error);
+            });
+        }
+    });
+</script>
+
+{% endblock %}

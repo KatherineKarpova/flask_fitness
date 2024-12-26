@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+log in
+{% endblock %}
+
+{% block main %}
+<!-- login form -->
+<form action="/resetPassword" method="post">
+    <div class="mb-3">
+        <input id="new-password" name="new-password" placeholder="new password" required>
+    </div>
+    <div class="mb-3"></div>
+        <input id="new-password-confirmation" name="new-password-confirmation" placeholder="confirm new password" required>
+    </div>
+    <button type="submit">reset</button>
+</form>
+
+{% endblock %}
