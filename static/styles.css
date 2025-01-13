@@ -6,16 +6,51 @@
 }
 
 label {
-    padding: 10px;
-    font-size: 23px;
+    padding: 5px;
+    font-size: 20px;
     color: #ff4c8b;        
     font-weight: bold;
-    margin-top: 5px;
+    font-family: 'Lucida Sans';
     margin-bottom: 0px;
 }
 h1 {
-    color: #890363; /* sets the text color for links */
-    font-size: 20px;
+    padding: 10px;
+    font-size: 30px;
+    color: #ff4c8b;        
+    font-style: italic;
+    font-family: 'Lucida Sans';
+    margin: 10px;
+}
+
+h2 {
+    padding: 10px;
+    font-size: 35px;
+    color: #f91c75;        
+    font-weight: bold;
+    font-style: italic;
+    font-family: 'Lucida Sans';
+    margin: 10px;
+    text-shadow: 
+        -1px -1px 0 #f3a6d6,/* top left shadow */
+        1px -1px 0 #f3a6d6,  /* top right shadow */
+        -1px 1px 0 #f3a6d6,  /* bottom left shadow */
+        1px 1px 0 #f3a6d6;
+}
+
+h3 {
+    padding: 15px;
+    font-size: 45px;
+    color: #f91c75;        
+    font-weight: bold;
+    font-style: italic;
+    font-family: 'Lucida Sans';
+    margin: 10px;
+    margin-bottom: 0px;
+    text-shadow: 
+        -1px -1px 0 #f3a6d6,/* top left shadow */
+        1px -1px 0 #f3a6d6,  /* top right shadow */
+        -1px 1px 0 #f3a6d6,  /* bottom left shadow */
+        1px 1px 0 #f3a6d6;
 }
 /* show dropdown menu when hovering over the parent */
 .nav-item.dropdown:hover .dropdown-menu {
@@ -75,22 +110,22 @@ nav {
         -1px -1px 0 #f91c75, /* top left shadow */
         1px -1px 0 #f91c75,  /* top right shadow */
         -1px 1px 0 #f91c75,  /* bottom left shadow */
-        1px 1px 0 #f91c75; 
+        1px 1px 0 #f91c75;
     letter-spacing: 1px;
     text-transform: uppercase;
     font-family: "Arial", sans-serif;
 }
 .navbar-brand:hover {
-    color: #ff4c8b;
+    color: #f91c75;
     text-shadow: 
-        -1px -1px 0 , #f3a6d6/* top left shadow */
+        -1px -1px 0 #f3a6d6,/* top left shadow */
         1px -1px 0 #f3a6d6,  /* top right shadow */
         -1px 1px 0 #f3a6d6,  /* bottom left shadow */
         1px 1px 0 #f3a6d6; 
 }
 .navbar-nav .nav-link {
     font-size: 1.3em;  /* increase font size */
-    color: #f91c75; /* white text for links */
+    color: #ff4c8b; /* white text for links */
     font-weight: bold;
     margin-right: 20px;
     padding: 8px 15px;
@@ -170,6 +205,7 @@ nav {
     color: #6d0041; /* deep berry purple text */
     transition: border-color 0.3s ease;
     text-align: center;
+    margin: 5px;
 }
 
 /* style for the weight and reps inputs (shorter and equal size) */
@@ -184,20 +220,22 @@ nav {
     color: #6d0041; /* deep berry purple text */
     transition: border-color 0.3s ease;
     text-align: center;
+    margin: 5px;
 }
 
 /* buttons */
 button, .btn {
     background-color: #ff4c8b;
     color: white;
-    padding: 15px 30px;
+    padding: 10px 20px;
+    font-family: 'Lucida Sans';
     font-size: 1.5em;
     border-radius: 25px;
     cursor: pointer;
     border: none;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, background-color 0.3s ease;
-    margin: 10px
+    margin: 5px
 }
 
 button:hover, .btn:hover {
@@ -223,6 +261,7 @@ select {   /* same width as short-input fields */
 }
 .routine-select{
     width: 200px;
+    text-align: center;
 }
 select:focus {
     border-color: #f91c75; /* border color when focused */
@@ -242,7 +281,7 @@ select:focus {
     border: 2px solid #ff4c8b; /* same border style */
     border-radius: 25px; /* rounded corners like the other inputs */
     padding: 5px;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 20px;   /* padding for a comfortable space inside */
     font-size: 1 em; /* same font size */
     background-color: #fff; /* white background for select */
@@ -261,4 +300,9 @@ select:focus {
 
 #entry-date .year {
     width: 80px; /* width for the year select */
+}
+
+.exercise-set-row-container {
+    display: flex;
+    justify-content: center;
 }

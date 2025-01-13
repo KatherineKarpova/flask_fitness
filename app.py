@@ -1,7 +1,7 @@
 from helpers import *
 import sqlite3
 from flask import Flask, jsonify, render_template, request, redirect, flash, session
-from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from flask_session import Session
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -42,41 +42,53 @@ def volume():
     sunday, saturday = past_week_dates(date.today())
     sunday = format_date(sunday)
     saturday = format_date(saturday)
-    conn, c = sqlite3_conn()
+    # conn, c = sqlite3_conn()
     # count num of rows grouped by the muscle worked as prime mover
-    volume_query = """SELECT COUNT(muscles.id) AS "sets", muscles.name AS "muscle"
-                        FROM muscles
-                        JOIN muscles_worked ON muscles.id = muscles_worked.muscle_id
-                        WHERE muscles_worked.exercise_id IN(
-                            SELECT logs.exercise_id
-                            FROM logs
-                            WHERE muscles_worked.role = "prime mover"
-                            AND date BETWEEN ? AND ?                                
-                            AND logs.user_id = ?
-                        )
-                        GROUP BY muscles.id"""
-    
-    # create dataframe by having pandas read the above query directly
-    # i find out that this method saves memory compared to getting results via fetchall()
-    volume_data = c.execute(volume_query, (sunday, saturday, session["user_id"])).fetchall()
+    subquery = (
+        db.session.query(Log.exercise_id)
+        .join(MuscleWorked, Log.exercise_id == MuscleWorked.exercise_id)
+        .filter(
+            MuscleWorked.role == "prime mover",
+            Log.date.between(sunday, saturday),
+            Log.user_id == session["user_id"]
+        )
+        .subquery()
+    )
 
-    volume_data = pandas.read_sql_query(volume_query, conn, params=(sunday, saturday, session["user_id"]))
+    query = (
+        db.session.query(
+            func.count(Muscle.id).label("sets"),
+            Muscle.name.label("muscle")
+        )
+        .join(MuscleWorked, Muscle.id == MuscleWorked.muscle_id)
+        .filter(MuscleWorked.exercise_id.in_(subquery))
+        .group_by(Muscle.id)
+    )
+    # create dataframe by having pandas read the above query directly
+    volume_data = pandas.read_sql(query.statement, db.session.bind)
+
     if volume_data.empty:
         volume_img = flash("no data found")
         return render_template("/volume.html", volume_img=volume_img)
+    
     # create a matplotlib figure to render the table
     fig, ax = plot.subplots(figsize=(6, 2))  # adjust size as necessary
     ax.axis("off")  # turn off the axes
 
     # render the dataframe as a table
-    table = ax.table(cellText=volume_data.values, colLabels=volume_data.columns, loc="center", cellLoc="center")
+    table = ax.table(
+        cellText=volume_data.values,
+        colLabels=volume_data.columns,
+        loc="center",
+        cellLoc="center"
+    )
 
     # save the table as an image in a bytesio object
     img_buf = io.BytesIO()
     plot.savefig(img_buf, format="png", bbox_inches="tight", pad_inches=0.05)
-    img_buf.seek(0)  # rewind the buffer to the beginning
+    img_buf.seek(0) # rewind the buffer to the beginning
 
-    # optionally, encode the image to base64 to embed in html directly
+    # encode the image to base64 to embed in html directly
     volume_img = base64.b64encode(img_buf.getvalue()).decode("utf-8")
 
     return render_template("/volume.html", volume_img=volume_img)
@@ -85,9 +97,6 @@ def volume():
 @app.route("/strength", methods=["GET"])
 @login_required
 def strength():
-    # https://www.geeksforgeeks.org/how-to-plot-a-dataframe-using-pandas/
-    # is a resource i used to create the line graph
-    # as well as https://www.w3schools.com/python/pandas/pandas_plotting.asp
     conn, c = sqlite3_conn()  # establish a connection to the database
     graphs = {}  # dictionary where key = exercise name and value = line graph
 
@@ -101,9 +110,10 @@ def strength():
 
     for row in exercises:
         exercise = row["exercise"]
+
         # convert the data into a pandas dataframe for easier plotting
         strength_query = """
-            SELECT MAX(logs.weight) AS highest_weight, logs.date
+            SELECT CAST(MAX(logs.weight) AS REAL) AS highest_weight, logs.date
             FROM logs
             JOIN exercises ON logs.exercise_id = exercises.id
             WHERE exercises.name = ? AND logs.user_id = ?
@@ -113,26 +123,34 @@ def strength():
         
         strength_data = pandas.read_sql_query(strength_query, conn, params=(exercise, session["user_id"]))
 
+        if strength_data.empty:  # Skip if no data available
+            continue
+
+        # Validate and clean data
+        strength_data.dropna(subset=["highest_weight", "date"], inplace=True)
+        strength_data["highest_weight"] = pandas.to_numeric(strength_data["highest_weight"], errors="coerce")
+        strength_data["date"] = pandas.to_datetime(strength_data["date"], errors="coerce")
+        strength_data.dropna(inplace=True)
+
         # create a plot using matplotlib
         plot.figure(figsize=(10, 6))
-        strength_data["date"] = pandas.to_datetime(strength_data["date"])  # convert date column to datetime
-
-        # plot the graph
         plot.plot(strength_data["date"], strength_data["highest_weight"], color="skyblue")
         plot.xlabel("date")
         plot.ylabel("weight")
-        plot.title(f"{exercise}")
+        plot.title(f"strength stats for {exercise}")
 
         # save the plot to a bytesio object to send it as an image
         img = io.BytesIO()
         plot.savefig(img, format="png")
         img.seek(0)
+        plot.close()  # Close the plot to free memory
 
         # encode the image to base64 for embedding in the html template
         graphs[exercise] = base64.b64encode(img.getvalue()).decode("utf8")
 
     conn.close()  # close the database connection
     return render_template("strength.html", graphs=graphs)  # render the template and pass the graphs dictionary
+
 
 # get exercise names with json to use with js
 @app.route("/json_exercises", methods=["GET"])
@@ -230,13 +248,11 @@ def full_routine():
         # join the three tables and fetch name of exercises and num sets
         routine = c.execute("""
             SELECT exercises.name AS exercise_name, routine_exercises.sets AS sets, part
-            FROM exercises
+            FROM exercises             
             JOIN routine_exercises ON exercises.id = routine_exercises.exercise_id
             JOIN routines ON routine_exercises.routine_id = routines.id
             WHERE routines.name = ? AND routines.user_id = ?
             """, (routine_name, session["user_id"])).fetchall()
-        conn.close()
-
         # check if any results are returned
         if routine:
             # return the results as a list of dictionaries
@@ -246,6 +262,7 @@ def full_routine():
                 'part': row['part']
             }for row in routine]
             print(routine_data)
+            conn.close()
             return jsonify(routine_data)  # return data as JSON
         else:
             return jsonify({"error": "routine not found"}), 404
@@ -295,8 +312,8 @@ def edit_routine():
     if request.method == "POST":
 
         # get selected routine
-        selected_routine = request.form.get("selected-routine-name")
-
+        selected_routine = request.form.get("routine-select")
+        print(selected_routine)
         # turn it into an obj
         routine_obj = Routine.query.filter_by(name=selected_routine, user_id=session["user_id"]).first()
 

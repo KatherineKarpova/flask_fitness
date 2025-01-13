@@ -1,6 +1,5 @@
 
 /* create tables to store user info, exercises, and workouts */
-
 CREATE TABLE users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     password_hash TEXT NOT NULL UNIQUE,
