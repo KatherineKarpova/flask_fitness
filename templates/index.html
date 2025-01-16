@@ -5,25 +5,29 @@
 {% endblock %}
 
 {% block main %}
-<form action="/" method="post">
-    <div id="entry-date"></div>
-    <div id="routine-select-container">
-        <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
-    </div>
-    <div id="routine-container"></div>
-    <div id="exercise-container">
-        <div class="exercise-entry"></div>
-    </div>
+    <form action="/" method="post">
+        <h2>
+            Record a Workout 
+        </h2>
+        <div id="entry-date"></div>
+        <div id="routine-select-container">
+            <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
+        </div>
+        <div id="routine-container"></div>
+        <div id="exercise-container">
+            <div class="exercise-entry"></div>
+        </div>
 
-    <div id="add-exercise-container"></div>
-    <div id="add-set-container"></div>
+        <div id="add-exercise-container"></div>
+        <div id="add-set-container"></div>
 
-    <button type="button" id="add-exercise">add exercise</button>
-    <button type="button" id="add-set">add set</button>
-    <div id="submit-log">
-        <button type="submit">record your workout!</button>
-    </div>
-</form>
+        <button type="button" id="add-exercise">add exercise</button>
+        <button type="button" id="add-set">add set</button>
+
+        <div id="submit-log">
+            <button type="submit">record your workout!</button>
+        </div>
+    </form>
 
 <script>
     let lastClicked = '';
@@ -45,14 +49,25 @@
 
     let set_num = 1;
     let lastExerciseDiv = null;
+    let setContainerDiv = document.createElement('div');
+    setContainerDiv.classList = "exercise-set-row-container";
 
     document.getElementById("add-exercise").addEventListener("click", function() {
+        // every time add exercise it clicked the sun_num starts at 1 again so the following sets start from 1 per exercise
+        set_num = 1;
         const exerciseContainer = document.getElementById("add-exercise-container");
         const newExerciseDiv = document.createElement("div");
-        newExerciseDiv.classList.add("exercise-entry");
+        newExerciseDiv.classList.add("exercise-entry-plus");
         lastExerciseDiv = newExerciseDiv;
-        inputExercise(newExerciseDiv).then(() => {
-            addSetInfo(set_num, newExerciseDiv);
+        setContainerDiv = document.createElement('div');
+        setContainerDiv.classList = "exercise-set-row-container";
+        addExerciseInputField(newExerciseDiv).then(() => {
+
+            const setDiv = document.createElement('div');
+            setDiv.className = "exercise-set-row";
+            addWeightRepsFieldsForSet(set_num, setDiv);
+            setContainerDiv.appendChild(setDiv);
+            newExerciseDiv.appendChild(setContainerDiv);
             exerciseContainer.appendChild(newExerciseDiv);
         }).catch(error => {
             console.error('Error fetching exercise data:', error);
@@ -60,17 +75,26 @@
     });
 
     document.getElementById("add-set").addEventListener("click", function() {
-        if (lastExerciseDiv) {
+        if (lastExerciseDiv && setContainerDiv) {
             set_num++;
-            addSetInfo(set_num, lastExerciseDiv);
+            const setDiv = document.createElement('div');
+            setDiv.classList = "exercise-set-row";
+        
+            addWeightRepsFieldsForSet(set_num, setDiv);
+            setContainerDiv.appendChild(setDiv);
+            lastExerciseDiv.appendChild(setContainerDiv);
+            // lastExerciseDiv.appendChild(setDiv)
         }
     });
+        // every time add exercise it clicked the sun_num starts at 1 again so the following sets start from 1 per exercise
+        // let set_num = 1;
+
 
     document.getElementById("routine-select").addEventListener("change", async function() {
-        const selectedRoutine = this.value;
-        if (selectedRoutine) {
+        const routineName = this.value;
+        if (routineName) {
             try {
-                const routineData = await getRoutineData(selectedRoutine);
+                const routineData = await getRoutineData(routineName);
                 console.log("routine data fetched")
                 if (Array.isArray(routineData)) {
                     const routineContainerElement = document.getElementById("routine-container");
@@ -86,8 +110,3 @@
     });
 </script>
 {% endblock %}
-
-
-
-
-

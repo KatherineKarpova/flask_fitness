@@ -1,19 +1,5 @@
 
-/* get weekly volume*/
-SELECT COUNT(muscles.id) AS "sets", muscles.name AS "muscle"
-FROM muscles
-JOIN muscles_worked ON muscles.id = muscles_worked.muscle_id
-WHERE muscles_worked.exercise_id IN(
-SELECT logs.exercise_id
-FROM logs
-WHERE date BETWEEN "2024-12-05" AND "2024-12-16"
-AND role = "prime mover"
-)
-GROUP BY muscles.id
-;
-
 /* create tables to store user info, exercises, and workouts */
-
 CREATE TABLE users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     password_hash TEXT NOT NULL UNIQUE,

@@ -1,8 +1,8 @@
-# Workout Tracker Web Application  
+# Resistance Training Tracker Web Application  
 By Katherine Karpova
 
 ### **Video Demo:**  
-[Insert Video URL Here]  
+\[(https://youtu.be/4lTAxe4cAQM)\]
 
 ### **Description:**  
 This project is a web application designed to track workouts efficiently and provide valuable insights into training progress. Built using Python, Flask, JavaScript, and SQL, the application offers a user-friendly interface with a focus on tracking metrics that matter most to the user.  

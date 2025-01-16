@@ -132,8 +132,6 @@ def try_int(value):
     try:
         value = int(value)
     except ValueError:
-        # flash a message to user on frontend and raise ValueError
-        flash("Invalid sets: Please enter a valid integer.", "danger")
         raise ValueError("Invalid integer input")
     finally:
         return value
@@ -190,7 +188,7 @@ def get_exercise_id(exercise):
     if exercise is None:
         flash(f"Exercise '{exercise}' not found.", "danger") #inform user of error
         raise ValueError("Exercise '{exercise}' not found.") # raise the error
-        # check if an exercise was found
+    # check if an exercise was found
     # return the exercise id
     return exercise.id
 

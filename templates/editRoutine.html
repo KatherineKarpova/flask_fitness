@@ -6,14 +6,17 @@
 
 {% block main %}
 <form id="edit-routine-form" action="/editRoutine" method="post">
+    <h2>Edit a Routine</h2>
     <div id="routine-select-container">
-        <select id="routine-select" name="selected-routine-name" placeholder="routine-name" class="routine-select"></select>
+        <select id="routine-select" name="routine-select" placeholder="routine-name" class="routine-select"></select>
         </select>
     </div> 
-    <input type="text" id="edit-routine-name" name="edit-routine-name" placeholder="enter routine name" class="long-input">
     <div id="edit-routine-container"></div>
-    <div id="add-exercise-container"></div>
-    <button type="button" id="add-exercise">add exercise</button>
+    <div id="add-exercise-container">
+    </div>
+    <div>
+        <button type="button" id="add-exercise">add exercise</button>
+    </div>
     <button type="submit" name="action" value="update">update</button>
     <button type="button" id="delete-button">delete</button>
     <div id="delete-confirmation" style="display:none;">
@@ -22,7 +25,6 @@
         <button type="button" id="cancel-button" class="btn btn-secondary">cancel</button>
     </div>
 </form>
-
 <script>
     // this function runs when the window is loaded
     window.onload = function() {
@@ -30,42 +32,43 @@
         getRoutines();
     };
 
-    // wait for the dom to be fully loaded before executing js
-    document.addEventListener("DOMContentLoaded", function() {
-        addExerciseSetsEvent();
+    // wait for the DOM to be fully loaded before executing JS
+    document.addEventListener("DOMContentLoaded", function () {
+
         deleteRoutineEvent(); // call the delete button handler here
 
         // handle when a routine is selected
-        document.getElementById("routine-select").addEventListener("change", function() {
-        console.log("routine selected");
+        document.getElementById("routine-select").addEventListener("change", function () {
+            console.log("routine selected");
 
-        const selectedRoutine = this.value;  // get the value of the selected routine
+            const selectedRoutine = this.value;  // get the value of the selected routine
 
-        // clear the previous form data by resetting the "edit-routine-container"
-        const routineContainer = document.getElementById("edit-routine-container");
-        routineContainer.innerHTML = '';  // clears all child elements (inputs, etc.)
+            // clear the previous form data by resetting the "edit-routine-container"
+            const routineContainer = document.getElementById("edit-routine-container");
+            routineContainer.innerHTML = '';  // clears all child elements (inputs, etc.)
 
-        if (selectedRoutine) {
+            if (selectedRoutine) {
+                // show input field for routine name that can be edited
+                const editNameInput = addInput("edit-routine-name", "edit routine name", routineContainer, "long-input")
+                // fill the value with name input field the selected routine name
+                editNameInput.value = selectedRoutine;
+                // fetch the routine data when a routine is selected
+                getRoutineData(selectedRoutine)
+                    .then(routineData => {
+                        // once data is fetched, generate the form for editing exercises
+                        editRoutineForm(routineData);
+                    })
+                    .catch(error => {
+                        console.error("error loading routine data:", error);
+                    });
+            }
+        });
 
-            const editNameInput = document.getElementById("edit-routine-name");
-            // show input field for routine name that can be edited
-            editNameInput.hidden = false;
-            // fill the value with name input field the selected routine name
-            editNameInput.value = selectedRoutine;
-
-            // fetch the routine data when a routine is selected
-            getRoutineData(selectedRoutine)
-                .then(routineData => {
-                // once data is fetched, generate the form for editing exercises
-                    editRoutineForm(routineData);
-                })
-                .catch(error => {
-                    console.error("error loading routine data:", error);
-                });
-        }
+        document.getElementById("add-exercise").addEventListener("click", function () {
+            addExerciseSetsFieldsEvent();
+        });
     });
-});
-
 </script>
+
 
 {% endblock %}
